@@ -5,19 +5,28 @@ import uuid
 from models import models
 from schemas import schemas
 
+from passlib.context import CryptContext
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+def get_password_hash(password):
+    return pwd_context.hash(password)
+
+
 def create_user(user: schemas.UsuarioCreate, db: Session):
     db_user = db.query(models.Usuario).filter(models.Usuario.email == user.email).first()
     if db_user:
         raise HTTPException(status_code=400, detail="Email already registered")
-    fake_hashed_password = user.contraseña + "notreallyhashed"
+    
     db_user = models.Usuario(
         nombre=user.nombre,
         apellido=user.apellido,
         dni=user.dni,
         email=user.email,
-        contraseña=fake_hashed_password,
+        contraseña=get_password_hash(user.contraseña),
         edad=user.edad,
-        telefono=user.telefono
+        telefono=user.telefono,
+        username=user.username
     )
     db.add(db_user)
     db.commit()

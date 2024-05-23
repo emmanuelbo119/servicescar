@@ -1,7 +1,8 @@
+
 from sqlalchemy import Column, ForeignKey, Integer, String, Text, Double, DateTime
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
-
+from datetime import datetime
 
 from database import Base
 import uuid
@@ -17,9 +18,53 @@ class Usuario(Base):
     contraseña = Column(String(255), nullable=False)
     edad = Column(Integer, nullable=False)
     telefono = Column(String(20), nullable=False)
+    username = Column(String(255), nullable=False)
+    ## relaciones
     asesor_consultas = relationship("AsesorConsulta", back_populates="usuario")
     automovilistas = relationship("Automovilista", back_populates="usuario")
     chofer_gruas = relationship("ChoferGrua", back_populates="usuario")
+    
+
+
+class Vehiculo(Base):
+    __tablename__ = "vehiculos"
+    __table_args__ = {'extend_existing': True} 
+    uuidvehiculo = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    modelo_id = Column(UUID(as_uuid=True), ForeignKey("modelo_vehiculos.uuidmodelovehiculo"))
+    automovilista_id = Column(UUID(as_uuid=True), ForeignKey("automovilistas.uuidusuario"))
+    color = Column(String)
+    patente = Column(String, nullable=True)
+    anio = Column(String)
+
+    # Relaciones
+    modelo = relationship("ModeloVehiculo")
+    automovilista = relationship("Automovilista", back_populates="vehiculos")
+
+
+class ModeloVehiculo(Base):
+    __tablename__ = "modelo_vehiculos"
+    __table_args__ = {'extend_existing': True} 
+    uuidmodelovehiculo = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    nombre = Column(String(255), nullable=False)
+    descripcion = Column(Text)
+    fechacreacion = Column(DateTime, nullable=False, default=datetime.utcnow)
+    fechamodificacion = Column(DateTime, default=datetime.utcnow)
+    marca_id = Column(UUID(as_uuid=True), ForeignKey("marca_vehiculos.uuidmarcavehiculo"))
+    # Relaciones
+    marca = relationship("MarcaVehiculo", back_populates="modelos")
+
+
+class MarcaVehiculo(Base):
+    __tablename__ = "marca_vehiculos"
+    __table_args__ = {'extend_existing': True} 
+    uuidmarcavehiculo = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    nombre = Column(String(255), nullable=False)
+    descripcion = Column(Text)
+    fechacreacion = Column(DateTime, nullable=False, default=datetime.utcnow)
+    fechamodificacion = Column(DateTime, default=datetime.utcnow)
+    # Relaciones
+    modelos = relationship("ModeloVehiculo", back_populates="marca", cascade="all, delete-orphan")
+
 
 
 
@@ -27,13 +72,16 @@ class AsesorConsulta(Base):
     __tablename__ = "asesor_consultas"
     __table_args__ = {'extend_existing': True} 
     uuidusuario = Column(UUID(as_uuid=True), ForeignKey("usuarios.uuidusuario"), primary_key=True)
+    horario = Column(String(255), nullable=True)
+    ## relaciones
     usuario = relationship("Usuario", back_populates="asesor_consultas")
-
+   
 
 class Automovilista(Base):
     __tablename__ = "automovilistas"
     __table_args__ = {'extend_existing': True} 
     uuidusuario = Column(UUID(as_uuid=True), ForeignKey("usuarios.uuidusuario"), primary_key=True)
+    ## relaciones
     usuario = relationship("Usuario", back_populates="automovilistas")
     vehiculos = relationship("Vehiculo", back_populates="automovilista")
 
@@ -43,6 +91,7 @@ class ChoferGrua(Base):
     __table_args__ = {'extend_existing': True} 
     uuidusuario = Column(UUID(as_uuid=True), ForeignKey("usuarios.uuidusuario"), primary_key=True)
     tipocarnet = Column(String(50), nullable=False)
+    ## relaciones
     usuario = relationship("Usuario", back_populates="chofer_gruas")
 
 
@@ -88,24 +137,7 @@ class MarcaRepuesto(Base):
     observaciones = Column(Text)
 
 
-class MarcaVehiculo(Base):
-    __tablename__ = "marca_vehiculos"
-    __table_args__ = {'extend_existing': True} 
-    uuidmarcavehiculo = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    nombre = Column(String(255), nullable=False)
-    descripcion = Column(Text)
-    fechacreacion = Column(DateTime, nullable=False)
-    fechamodificacion = Column(DateTime)
 
-
-class ModeloVehiculo(Base):
-    __tablename__ = "modelo_vehiculos"
-    __table_args__ = {'extend_existing': True} 
-    uuidmodelovehiculo = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    nombre = Column(String(255), nullable=False)
-    descripcion = Column(Text)
-    fechacreacion = Column(DateTime, nullable=False)
-    fechamodificacion = Column(DateTime)
 
 
 class Repuesto(Base):
@@ -150,16 +182,8 @@ class TallerMecanico(Base):
 class TipoServicioMantenimiento(Base):
     __tablename__ = "tipo_servicio_mantenimientos"
     __table_args__ = {'extend_existing': True} 
+
     uuidtiposerviciomantenimiento = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     nombre = Column(String(255), nullable=False)
     descripcion = Column(Text)
 
-
-class Vehiculo(Base):
-    __tablename__ = "vehiculos"
-    __table_args__ = {'extend_existing': True} 
-    uuidvehiculo = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    modelo = Column(UUID(as_uuid=True), ForeignKey("modelo_vehiculos.uuidmodelovehiculo"))
-    automovilista_id = Column(UUID(as_uuid=True), ForeignKey("automovilistas.uuidusuario"))
-    modelo_vehiculo = relationship("ModeloVehiculo")
-    automovilista = relationship("Automovilista", back_populates="vehiculos")

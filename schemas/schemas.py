@@ -4,32 +4,22 @@ from uuid import UUID
 from datetime import datetime
 import re
 
-dni_pattern = r"^\d{7,8}$"
-telefono_pattern = r"^\d{10,11}$"
+#dni_pattern = r"^\d{7,8}$"
+#telefono_pattern = r"^\d{10,11}$"
 
 class UsuarioBase(BaseModel):
     nombre: str
     apellido: str
-    dni: str = Field(..., pattern=dni_pattern)
+    dni: str #= Field(..., pattern=dni_pattern)#= Field(..., pattern=dni_pattern)
     email: EmailStr
-    edad: int =Field(..., gt=18, lt=150, description="Edad debe ser mayor a 18 y menor a 150")
-    telefono: str = Field(..., pattern=telefono_pattern)
+    edad: int 
+    telefono: str#str = Field(..., pattern=telefono_pattern)
+    username: str 
 
     @validator('email')
     def validate_email(cls, v):
         return v
 
-    @validator('dni')
-    def validate_dni(cls, v):
-        if not re.match(dni_pattern, v):
-            raise ValueError('Invalid DNI format')
-        return v
-
-    @validator('telefono')
-    def validate_telefono(cls, v):
-        if not re.match(telefono_pattern, v):
-            raise ValueError('Invalid phone number format')
-        return v
 
 class UsuarioCreate(UsuarioBase):
     contraseña: str
@@ -236,8 +226,12 @@ class TipoServicioMantenimiento(TipoServicioMantenimientoBase):
 
 
 class VehiculoBase(BaseModel):
-    modelo: Optional[UUID] = None
-    automovilista_id: Optional[UUID] = None
+    modelo_id: UUID
+    automovilista_id: UUID
+    color: str
+    patente: Optional[str] = None
+    anio: str
+    marca_id:UUID
 
 class VehiculoCreate(VehiculoBase):
     pass
@@ -247,3 +241,9 @@ class Vehiculo(VehiculoBase):
 
     class Config:
         orm_mode = True
+class EmailPasswordRequestForm(BaseModel):
+    email: str
+    password: str
+class TokenResponse(BaseModel):
+    access_token: str
+    token_type: str
