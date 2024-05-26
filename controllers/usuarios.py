@@ -26,7 +26,7 @@ def create_user(user: schemas.UsuarioCreate, db: Session):
         contraseña=get_password_hash(user.contraseña),
         edad=user.edad,
         telefono=user.telefono,
-        username=user.username
+        username=user.username,
     )
     db.add(db_user)
     db.commit()
@@ -59,7 +59,7 @@ def update_user(user_id: uuid.UUID, updated_user: schemas.UsuarioCreate, db: Ses
     db_user.apellido = updated_user.apellido
     db_user.dni = updated_user.dni
     db_user.email = updated_user.email
-    db_user.contraseña = updated_user.contraseña + "notreallyhashed"
+    db_user.contraseña = get_password_hash(updated_user.contraseña),
     db_user.edad = updated_user.edad
     db_user.telefono = updated_user.telefono
 

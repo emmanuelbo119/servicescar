@@ -11,7 +11,11 @@ import database
 from schemas.schemas import TokenResponse, EmailPasswordRequestForm
 
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
-router = APIRouter()
+router = APIRouter(
+    prefix="/auth",
+    tags=["auth"],
+    responses={404: {"description": "Not found"}},
+)
 
 
 
