@@ -24,7 +24,7 @@ class UsuarioCreate(UsuarioBase):
 class Usuario(UsuarioBase):
     fechaCreacion: datetime
     fechaModificacion: Optional[datetime]
-    uuidusuario: UUID
+    uuidUsuario: UUID
 
     class Config:
         orm_mode = True
@@ -117,7 +117,7 @@ class MantenimientoBase(BaseModel):
     descripcion: str
     costo: float
     observacionesadicionales: Optional[str] = None
-    tallermecanico_id: Optional[UUID] = None
+    uuidTallerMecanico: Optional[UUID] = None
     estado: Optional[UUID] = None
 
 class MantenimientoCreate(MantenimientoBase):
@@ -135,7 +135,7 @@ class TallerMecanicoBase(BaseModel):
     direccion: str
     latitud: float
     longitud: float
-    horarioatencion: str
+    horarioAtencion: str
     servicios: Optional[str] = None
     fechaCreacion: datetime
     fechaModificacion: datetime
@@ -144,7 +144,7 @@ class TallerMecanicoCreate(TallerMecanicoBase):
     pass
 
 class TallerMecanico(TallerMecanicoBase):
-    uuidtallermecanico: UUID
+    uuidTallermecanico: UUID
 
     class Config:
         orm_mode = True
@@ -165,6 +165,21 @@ class TipoServicioMantenimiento(TipoServicioMantenimientoBase):
 
     class Config:
         orm_mode = True
+
+class TurnoBase(BaseModel):
+    fecha: datetime
+    hora: datetime
+    estado: UUID
+    uuidTallerMecanico: UUID
+ 
+class TurnoCreate(TurnoBase):
+    pass
+
+class Turno(TurnoBase):
+    uuidTurno: UUID
+    class Config:
+        orm_mode = True
+
 
 
 ## ----------------------------- Authenticated --------------------------------
