@@ -1,22 +1,23 @@
 from sqlalchemy.orm import Session
 from fastapi import HTTPException
 from datetime import date, datetime, time, timedelta
-from models import models
+from models import models  
 from schemas import schemas
 import uuid
 
-def getTurnosDisponibles(tallermecanico_id: uuid.UUID, db: Session, start_date: datetime = None, end_date: datetime = None):
+def getTurnosDisponibles(tallermecanico_id: uuid.UUID, db: Session, start_date: date = None, end_date: date = None):
     ## Si no se proporciona la fecha de inicio y fin de la consulta se toma por defecto 1 semana desde la fecha actual 
     if not start_date:
         start_date = datetime.now()
     if not end_date:
         end_date = start_date + timedelta(weeks=1)
-    
-    turnos = db.query(models.Turno).filter(
+    # Filtrar los turnos disponibles usando JOIN
+    turnos = db.query(models.Turno).join(models.EstadoTurno).filter(
         models.Turno.uuidTallerMecanico == tallermecanico_id,
-        models.Turno.estado == models.EstadoTurno.disponible,
         models.Turno.fecha >= start_date,
-        models.Turno.fecha <= end_date
+        models.Turno.fecha <= end_date,
+        models.EstadoTurno.nombre=='Disponible'
+        
     ).all()
 
     return turnos
@@ -43,7 +44,7 @@ def generate_turnos(tallermecanico_id: uuid.UUID, fechaInicio: date, fechaFin: d
     ## genera una lista de turnos entre fecha inicio y fecha fin
     ## el intervalod de tiempo debe ser en minutos 
       # Obtener el UUID del estado "disponible"
-    estado_disponible = db.query(models.EstadoTurno).filter(models.EstadoTurno.nombre == 'Disponible').first()
+    estado_disponible = db.query(models.Turno.EstadoTurno).filter(models.Turno.EstadoTurno.nombre == 'Disponible').first()
     if not estado_disponible:
         raise HTTPException(status_code=404, detail="Estado 'disponible' no encontrado")
     turnos = []

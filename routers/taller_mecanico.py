@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import date, datetime
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import NoResultFound
@@ -36,6 +36,6 @@ async def get_tallerMecanico(tallerMecanico_id: UUID, db: Session = Depends(get_
 
 
 @router.get("/{tallerMecanico_id}/turnosDisponibles", response_model=List[schemas.Turno])
-async def read_available_turnos( tallerMecanico_id: UUID,start_date: Optional[datetime] = None,end_date: Optional[datetime] = None,db: Session = Depends(get_db)):
+async def read_available_turnos( tallerMecanico_id: UUID,start_date: Optional[date] = None,end_date: Optional[date] = None,db: Session = Depends(get_db)):
     turnos_disponnibles = turnos_cotroller.getTurnosDisponibles(tallerMecanico_id, db, start_date, end_date)
     return turnos_disponnibles
