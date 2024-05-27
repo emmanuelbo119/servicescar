@@ -2,11 +2,11 @@ from sqlalchemy.orm import Session
 from fastapi import HTTPException
 from typing import List
 import uuid
-from models import models
-from schemas import schemas
+from models import MarcaVehiculo
+from schemas import MarcaVehiculoCreate
 
-def create_marca(db: Session, marca: schemas.MarcaVehiculoCreate):
-    db_marca = models.MarcaVehiculo(
+def create_marca(db: Session, marca: MarcaVehiculoCreate):
+    db_marca = MarcaVehiculo(
         nombre=marca.nombre,
         descripcion=marca.descripcion,
         fechacreacion=marca.fechacreacion,
@@ -18,13 +18,13 @@ def create_marca(db: Session, marca: schemas.MarcaVehiculoCreate):
     return db_marca
 
 def get_marca(db: Session, marca_id: uuid.UUID):  # Asegúrate de que marca_id sea de tipo UUID
-    return db.query(models.MarcaVehiculo).filter(models.MarcaVehiculo.uuidmarcavehiculo == marca_id).first()
+    return db.query(MarcaVehiculo).filter(MarcaVehiculo.uuidmarcavehiculo == marca_id).first()
 
-def get_marcas(db: Session, skip: int = 0, limit: int = 10) -> List[models.MarcaVehiculo]:
-    return db.query(models.MarcaVehiculo).offset(skip).limit(limit).all()
+def get_marcas(db: Session, skip: int = 0, limit: int = 10) -> List[MarcaVehiculo]:
+    return db.query(MarcaVehiculo).offset(skip).limit(limit).all()
 
 def delete_marca(db: Session, marca_id: uuid.UUID):  # Asegúrate de que marca_id sea de tipo UUID
-    db_marca = db.query(models.MarcaVehiculo).filter(models.MarcaVehiculo.uuidmarcavehiculo == marca_id).first()
+    db_marca = db.query(MarcaVehiculo).filter(MarcaVehiculo.uuidmarcavehiculo == marca_id).first()
     if db_marca:
         db.delete(db_marca)
         db.commit()

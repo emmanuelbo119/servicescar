@@ -1,12 +1,12 @@
 from datetime import date, datetime, time
 from fastapi import APIRouter,Depends, HTTPException
-from sqlalchemy.orm import Session
-import models
-from schemas import schemas
+from sqlalchemy.orm import Session 
+from schemas import TurnoResponseReserva,Turno
 from typing import List 
 from database import SessionLocal, engine, get_db
 from uuid import UUID
 from controllers import turnos as turnos_controller
+from schemas.schemas import TurnoBase
 
 
 
@@ -17,14 +17,13 @@ router = APIRouter(
 
 )
 
-@router.get("/",response_model=schemas.Turno)
-async def read_turnos(skip: int=0,limit:int=10,db:Session=Depends(get_db)) :
-    turnos = turnos_controller.getAllTurnos(db,skip,limit)
+@router.get("/", response_model=List[Turno])
+def get_turnos(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
+    marcas = turnos_controller.get_turnos(db, skip=skip, limit=limit)
+    return marcas
 
 
-
-
-@router.post("/CrearTurnos", response_model=List[schemas.Turno])
+@router.post("/CrearTurnos", response_model=List[Turno])
 def create_turnos(
     tallermecanico_id: UUID,
     fechaInicio: date,
@@ -35,3 +34,17 @@ def create_turnos(
     db: Session = Depends(get_db)
 ):
     return turnos_controller.generate_turnos(tallermecanico_id, fechaInicio, fechaFin, horaInicio, horaFin, intervalo, db)
+
+
+@router.post("/{turno_id}/reservar", response_model=TurnoResponseReserva)
+def reservar_turno(turno_id: UUID, db: Session = Depends(get_db)):
+    return turnos_controller.reservarTurno(db, turno_id)
+
+@router.get("/{turno_id}", response_model=List[Turno])
+def getTurnoByID(turno_id: UUID, db: Session = Depends(get_db)):
+    return turnos_controller.get_turnosById(db, turno_id)
+
+
+@router.post("/{turno_id}/cancelar", response_model=TurnoResponseReserva)
+def reservar_turno(turno_id: UUID, db: Session = Depends(get_db)):
+    return turnos_controller.CancelarTurno(db, turno_id)

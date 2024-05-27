@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from routers import auth, modelo_vehiculo,users,marca_vehiculo, vehiculo,taller_mecanico,turnos
+from routers import auth, modelo_vehiculo,marca_vehiculo, usuarios, vehiculo,taller_mecanico,turnos
 from models import models
 from schemas import schemas
 from database import engine
@@ -9,7 +9,7 @@ models.Base.metadata.create_all(bind=engine,)
 
 app = FastAPI() 
 
-app.include_router(users.router)
+app.include_router(usuarios.router)
 app.include_router(auth.router)
 app.include_router(vehiculo.router)
 app.include_router(marca_vehiculo.router)

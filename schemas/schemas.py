@@ -34,19 +34,19 @@ class Usuario(UsuarioBase):
 
 class VehiculoBase(BaseModel):
     modelo_id: UUID
-    automovilista_id: UUID
+    usuario_id: UUID
     color: str
     patente: Optional[str] = None
     anio: str
     marca_id:UUID
     fechaCreacion: datetime
-    fechaModificacion: datetime
+    fechaModificacion: Optional[datetime]
 
 class VehiculoCreate(VehiculoBase):
-    pass
+    uuidvehiculo: UUID
 
 class Vehiculo(VehiculoBase):
-    uuidvehiculo: UUID
+    pass
 
     class Config:
         orm_mode = True
@@ -166,20 +166,43 @@ class TipoServicioMantenimiento(TipoServicioMantenimientoBase):
     class Config:
         orm_mode = True
 
+
+
+class EstadoTurnoBase(BaseModel):
+    nombre: str
+    descripcion: Optional[str] = None
+
+
+class EstadoTurnoCreate(EstadoTurnoBase):
+    pass
+
+class EstadoTurno(EstadoTurnoBase):
+    uuidEstadoTurno: UUID
+
+    class Config:
+        orm_mode = True
+
+
+
 class TurnoBase(BaseModel):
     fecha: datetime
     hora: datetime
-    estado: UUID
     uuidTallerMecanico: UUID
+    uuidEstadoTurno: UUID
+    estado:EstadoTurnoBase
+
  
 class TurnoCreate(TurnoBase):
     pass
+
+class TurnoResponseReserva(TurnoBase):
+    uuidTurno: UUID
+
 
 class Turno(TurnoBase):
     uuidTurno: UUID
     class Config:
         orm_mode = True
-
 
 
 ## ----------------------------- Authenticated --------------------------------

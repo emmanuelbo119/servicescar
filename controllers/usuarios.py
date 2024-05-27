@@ -66,3 +66,4 @@ def update_user(user_id: uuid.UUID, updated_user: schemas.UsuarioCreate, db: Ses
     db.commit()
     db.refresh(db_user)
     return db_user
+
