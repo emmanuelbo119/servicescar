@@ -45,6 +45,6 @@ def getTurnoByID(turno_id: UUID, db: Session = Depends(get_db)):
     return turnos_controller.get_turnosById(db, turno_id)
 
 
-@router.post("/{turno_id}/cancelar", response_model=TurnoResponseReserva)
+@router.post("/{turno_id}/reservar", response_model=TurnoResponseReserva)
 def reservar_turno(turno_id: UUID, db: Session = Depends(get_db)):
-    return turnos_controller.CancelarTurno(db, turno_id)
+    return turnos_controller.reservarTurno(db, turno_id)

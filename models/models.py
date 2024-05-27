@@ -33,12 +33,13 @@ class MarcaVehiculo(Base):
     
     # Relaciones
     modelos = relationship("ModeloVehiculo", back_populates="marca", cascade="all, delete-orphan")
+    vehiculos = relationship("Vehiculo", back_populates="marca")
 
 class ModeloVehiculo(Base):
     __tablename__ = "modelo_vehiculos"
     uuidmodelovehiculo = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     nombre = Column(String(255), nullable=False)
-    descripcion = Column(Text)
+    descripcion = Column(Text,nullable=True)
     fechaCreacion = Column(DateTime, nullable=False, default=datetime.utcnow)
     fechaModificacion = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     marca_id = Column(UUID(as_uuid=True), ForeignKey("marca_vehiculos.uuidmarcavehiculo"), nullable=False)
@@ -58,12 +59,13 @@ class Vehiculo(Base):
     marca_id = Column(UUID(as_uuid=True), ForeignKey("marca_vehiculos.uuidmarcavehiculo"))
     fechaCreacion = Column(DateTime, nullable=False, default=datetime.utcnow)
     fechaModificacion = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-    usuarios= relationship("Usuario",backref="usuarios")
+    ##usuarios= relationship("Usuario",backref="usuarios")
     
     # Relaciones
     modelo = relationship("ModeloVehiculo")
     usuario = relationship("Usuario", back_populates="vehiculos")
     mantenimientos = relationship("Mantenimiento", back_populates="vehiculo", cascade="all, delete-orphan")
+    marca = relationship("MarcaVehiculo", back_populates="vehiculos")
 
 class EstadoMantenimiento(Base):
     __tablename__ = "estado_mantenimientos"
@@ -104,6 +106,7 @@ class ServicioMantenimiento(Base):
     tipo_servicio_mantenimiento = relationship("TipoServicioMantenimiento")
     mantenimiento = relationship("Mantenimiento")
 
+
 class TallerMecanico(Base):
     __tablename__ = "taller_mecanicos"
     __table_args__ = {'extend_existing': True} 
@@ -117,7 +120,7 @@ class TallerMecanico(Base):
     fechaCreacion = Column(DateTime(timezone=True), server_default=func.now())
     fechaModificacion = Column(DateTime(timezone=True), onupdate=func.now())
     turnos = relationship("Turno", back_populates="taller_mecanico", cascade="all, delete-orphan")
-
+    
 class TipoServicioMantenimiento(Base):
     __tablename__ = "tipo_servicio_mantenimientos"
     __table_args__ = {'extend_existing': True} 
@@ -139,6 +142,9 @@ class Turno(Base):
     uuidTallerMecanico = Column(UUID(as_uuid=True), ForeignKey("taller_mecanicos.uuidTallermecanico"), nullable=False)
     taller_mecanico = relationship("TallerMecanico", back_populates="turnos")
     estado = relationship("EstadoTurno", back_populates="turnos")
+
+
+
 
 class EstadoTurno(Base):
     __tablename__ = "turnosEstados"

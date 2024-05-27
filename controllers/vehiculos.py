@@ -1,4 +1,4 @@
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session,joinedload
 from fastapi import HTTPException
 from typing import List
 from uuid import UUID
@@ -55,9 +55,17 @@ def actualizarVehiculo(db: Session, automovil_id: UUID,automovil_updated: schema
 
 
 
-
-def get_vehiuclos_by_user(user_id:UUID, db:Session):
-    db_user = db.query(Vehiculo).filter(Vehiculo.usuario_id==user_id).all()
-    if db_user is None:
+def get_vehiculos_by_user(user_id: UUID, db: Session) -> List[Vehiculo]:
+    db_vehiculos = (
+        db.query(Vehiculo)
+        .filter(Vehiculo.usuario_id == user_id)
+        .options(
+            joinedload(Vehiculo.marca),
+            joinedload(Vehiculo.modelo)
+        )
+        .all()
+    )
+    if not db_vehiculos:
         raise HTTPException(status_code=404, detail="User not found")
-    return db_user
+    
+    return db_vehiculos

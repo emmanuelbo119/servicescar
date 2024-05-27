@@ -32,27 +32,6 @@ class Usuario(UsuarioBase):
 
 ##  --------------------------- Vehiculo --------------------------------
 
-class VehiculoBase(BaseModel):
-    modelo_id: UUID
-    usuario_id: UUID
-    color: str
-    patente: Optional[str] = None
-    anio: str
-    marca_id:UUID
-    fechaCreacion: datetime
-    fechaModificacion: Optional[datetime]
-
-class VehiculoCreate(VehiculoBase):
-    uuidvehiculo: UUID
-
-class Vehiculo(VehiculoBase):
-    pass
-
-    class Config:
-        orm_mode = True
-
-
-
 
 class MarcaVehiculoBase(BaseModel):
     nombre: str
@@ -67,11 +46,12 @@ class MarcaVehiculo(MarcaVehiculoBase):
     uuidmarcavehiculo: UUID
 
 class MarcaVehiculoBasic(BaseModel):
+    uuidmarcavehiculo: UUID
     nombre: str
-    descripcion:  str
 
     class Config:
         orm_mode = True
+
 
 
 class ModeloVehiculoBase(BaseModel):
@@ -84,11 +64,41 @@ class ModeloVehiculoBase(BaseModel):
 class ModeloVehiculoCreate(ModeloVehiculoBase):
     pass
 
+class ModeloVehiculoBasic(BaseModel):
+    uuidmodelovehiculo: UUID
+    nombre: str
+
 class ModeloVehiculo(ModeloVehiculoBase):
     uuidmodelovehiculo: UUID
 
     class Config:
         orm_mode = True
+
+
+
+class VehiculoBase(BaseModel):
+    modelo_id: UUID
+    usuario_id: UUID
+    color: str
+    patente: Optional[str] = None
+    anio: str
+    marca_id:UUID
+    fechaCreacion: datetime
+    fechaModificacion: Optional[datetime]
+
+class VehiculoCreate(VehiculoBase):
+    uuidvehiculo: UUID
+
+class Vehiculo(VehiculoBase):
+    uuidvehiculo: UUID
+    marca:MarcaVehiculoBasic
+    modelo:ModeloVehiculoBasic
+
+    class Config:
+        orm_mode = True
+
+
+
 
 
  
@@ -137,8 +147,9 @@ class TallerMecanicoBase(BaseModel):
     longitud: float
     horarioAtencion: str
     servicios: Optional[str] = None
-    fechaCreacion: datetime
-    fechaModificacion: datetime
+    fechaCreacion: Optional[datetime]
+    fechaModificacion: Optional[datetime]
+
 
 class TallerMecanicoCreate(TallerMecanicoBase):
     pass
@@ -197,7 +208,7 @@ class TurnoCreate(TurnoBase):
 
 class TurnoResponseReserva(TurnoBase):
     uuidTurno: UUID
-
+    taller_mecanico: TallerMecanico 
 
 class Turno(TurnoBase):
     uuidTurno: UUID
@@ -213,3 +224,4 @@ class EmailPasswordRequestForm(BaseModel):
 class TokenResponse(BaseModel):
     access_token: str
     token_type: str
+    uuidUsuario: UUID

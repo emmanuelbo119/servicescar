@@ -1,9 +1,10 @@
 from typing import List
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session,joinedload
 from fastapi import HTTPException
 from datetime import date, datetime, time, timedelta
 from models import EstadoTurno as EstadoTurnoModel
 from models import Turno as TurnoModel 
+from models import TallerMecanico as TallerMecanicoModelModel
 from schemas import schemas
 import uuid
 
@@ -14,6 +15,8 @@ def getTurnosDisponibles(tallermecanico_id: uuid.UUID, db: Session, start_date: 
     if not end_date:
         end_date = start_date + timedelta(weeks=1)
     # Filtrar los turnos disponibles usando JOIN
+    print(start_date)
+    print(end_date)
     turnos = db.query(TurnoModel).join(EstadoTurnoModel).filter(
         TurnoModel.uuidTallerMecanico == tallermecanico_id,
         TurnoModel.fecha >= start_date,
@@ -70,28 +73,28 @@ def generate_turnos(tallermecanico_id: uuid.UUID, fechaInicio: date, fechaFin: d
 
 
 def reservarTurno(db: Session, turno_id: uuid.UUID):
-    # Obtener el turno por su ID
     turno = db.query(TurnoModel)\
         .filter(TurnoModel.uuidTurno == turno_id)\
+        .options(joinedload(TurnoModel.taller_mecanico))\
         .first()
     
     if not turno:
         raise HTTPException(status_code=404, detail="Turno no encontrado")
     
-    # Verificar el estado actual del turno usando la relación estado
+  
     if turno.estado.nombre != 'Disponible':
         raise HTTPException(status_code=400, detail="Turno no disponible")
 
-    # Obtener el objeto del estado 'Ocupado'
+   
     estado_ocupado = db.query(EstadoTurnoModel).filter(EstadoTurnoModel.nombre == 'Ocupado').first()
     if not estado_ocupado:
         raise HTTPException(status_code=404, detail="Estado 'Ocupado' no encontrado")
-    
-    # Actualizar el estado del turno usando la relación ORM
     turno.estado = estado_ocupado
     db.commit()
     db.refresh(turno)
     return turno
+
+
 
 def get_turnos(db: Session, skip: int, limit: int):
     turnos = db.query(TurnoModel).join(EstadoTurnoModel).offset(skip).limit(limit).all()
