@@ -18,7 +18,7 @@ router = APIRouter(
 #CRUD
 
 @router.post("/", response_model=schemas.VehiculoCreate)
-def create_car(car: schemas.Vehiculo, db: Session = Depends(get_db)):
+def create_car(car: schemas.VehiculoBase, db: Session = Depends(get_db)):
     return vehiculos.crearVehiculo(car, db)
 
 @router.get("/", response_model=List[schemas.Vehiculo])
@@ -51,4 +51,4 @@ def get_mantenimientos_by_vehiculo(vehiculo_id: UUID, db: Session = Depends(get_
 
 @router.get("/{user_id}/vehiculos", response_model=List[schemas.Vehiculo])
 def get_vehiculos(user_id: UUID, db: Session = Depends(get_db)):
-    return vehiculos.get_vehiculos_by_user(user_id, db)
+    return vehiculos.get_vehiculos_by_user(user_id, db) 

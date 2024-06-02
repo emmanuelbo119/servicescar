@@ -35,3 +35,8 @@ def delete_user(user_id: uuid.UUID, db: Session = Depends(database.get_db)):
 @router.put("/{user_id}", response_model=schemas.Usuario)
 def update_user(user_id: uuid.UUID, updated_user: schemas.UsuarioCreate, db: Session = Depends(database.get_db)):
     return user_controller.update_user(user_id, updated_user, db)
+
+
+@router.post("/reset-password")
+def reset_password(request: schemas.ResetPasswordRequest, db: Session = Depends(database.get_db)):
+    return user_controller.reset_password(request.email, request.new_password, db)

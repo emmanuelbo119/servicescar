@@ -88,11 +88,13 @@ class Mantenimiento(Base):
     tallermecanico_id = Column(UUID(as_uuid=True), ForeignKey("taller_mecanicos.uuidTallermecanico"))
     estado = Column(UUID(as_uuid=True), ForeignKey("estado_mantenimientos.uuidestadomantenimiento"))
     vehiculo_id = Column(UUID(as_uuid=True), ForeignKey("vehiculos.uuidvehiculo"), nullable=False)
+    usuario_id =Column(UUID(as_uuid=True), ForeignKey("Usuarios.uuidusuarios"), nullable=False)
     
     # Relaciones
     taller_mecanico = relationship("TallerMecanico")
     estado_mantenimiento = relationship("EstadoMantenimiento")
     vehiculo = relationship("Vehiculo", back_populates="mantenimientos")
+    usuario= relationship("Usuarios", back_populates="usuarios")
 
 class ServicioMantenimiento(Base):
     __tablename__ = "servicio_mantenimientos"

@@ -225,3 +225,7 @@ class TokenResponse(BaseModel):
     access_token: str
     token_type: str
     uuidUsuario: UUID
+
+class ResetPasswordRequest(BaseModel):
+    email: str
+    new_password: str

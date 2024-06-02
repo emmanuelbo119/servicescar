@@ -67,3 +67,13 @@ def update_user(user_id: uuid.UUID, updated_user: schemas.UsuarioCreate, db: Ses
     db.refresh(db_user)
     return db_user
 
+def reset_password(email: str, new_password: str, db: Session):
+    user = db.query(models.Usuario).filter(models.Usuario.email == email).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    user.contraseña = get_password_hash(new_password)
+    db.commit()
+    return {"msg": "Password reset successful"}
+    
+

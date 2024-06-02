@@ -41,10 +41,15 @@ def reservar_turno(turno_id: UUID, db: Session = Depends(get_db)):
     return turnos_controller.reservarTurno(db, turno_id)
 
 @router.get("/{turno_id}", response_model=List[Turno])
-def getTurnoByID(turno_id: UUID, db: Session = Depends(get_db)):
+async def getTurnoByID(turno_id: UUID, db: Session = Depends(get_db)):
     return turnos_controller.get_turnosById(db, turno_id)
 
 
 @router.post("/{turno_id}/reservar", response_model=TurnoResponseReserva)
-def reservar_turno(turno_id: UUID, db: Session = Depends(get_db)):
+async def reservar_turno(turno_id: UUID, db: Session = Depends(get_db)):
     return turnos_controller.reservarTurno(db, turno_id)
+
+
+@router.get("/{user_id}", response_model=TurnoResponseReserva)
+async def get_turno_by_user(user_id: UUID, db: Session = Depends(get_db)):
+    return turnos_controller.get_turno_by_user(db, user_id)

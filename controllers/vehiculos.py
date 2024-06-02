@@ -7,7 +7,7 @@ from schemas import schemas
 from datetime import datetime
 
 
-def crearVehiculo(car: schemas.VehiculoCreate, db: Session):
+def crearVehiculo(car: schemas.VehiculoBase, db: Session):
     db_car = Vehiculo(
         marca_id=car.marca_id,
         modelo_id=car.modelo_id,

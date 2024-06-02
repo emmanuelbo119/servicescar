@@ -22,12 +22,3 @@ def get_modelos(db: Session = Depends(get_db)):
 
 
 
-@router.get("/{marca_id}/modelos/", response_model=List[schemas.ModeloVehiculo])
-def get_modelos_by_marca(marca_id: uuid.UUID, db: Session = Depends(get_db)):
-    try:
-        modelos = db.query(models.ModeloVehiculo).filter(models.ModeloVehiculo.marca_id == marca_id).all()
-        if not modelos:
-            raise HTTPException(status_code=404, detail="Models not found")
-        return modelos
-    except NoResultFound:
-        raise HTTPException(status_code=404, detail="Model not found")
