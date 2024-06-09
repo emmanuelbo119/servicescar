@@ -48,7 +48,6 @@ async def reservar_turno(turno_id: UUID,vehiculo_id: UUID, db: Session = Depends
     return turnos_controller.reservarTurno(db, turno_id,vehiculo_id)
 
 
-@router.get("/{user_id}", response_model=TurnoResponseReserva)
-async def get_turno_by_user(user_id: UUID, db: Session = Depends(get_db)):
-    return turnos_controller.get_turno_by_user(db, user_id)
-
+@router.get("/{usuario_id}/turnos", response_model=List[TurnoResponseReserva])
+async def get_turnos_by_usuario(usuario_id: UUID, db: Session = Depends(get_db)):
+    return turnos_controller.get_turnos_by_usuario(db, usuario_id)

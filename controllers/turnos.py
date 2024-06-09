@@ -9,6 +9,7 @@ from models import TallerMecanico as TallerMecanicoModelModel
 from models import Usuario as UserModel
 from models import MarcaVehiculo as MarcaModel
 from models import ModeloVehiculo as ModeloVehiculoModel
+from models.models import TurnoVehiculos
 from schemas import schemas
 import uuid
 
@@ -165,14 +166,20 @@ def CancelarTurno(db: Session, turno_id: uuid.UUID):
     return turno
 
 
-
-# def get_turno_by_user(db: Session, user_id: uuid.UUID):
-#     turno = db.query(UserModel).filter(UserModel.uuidUsuario == user_id)
-
-#         .join(EstadoTurnoModel)\
-#         .filter(TurnoModel.uuidTurno == user_id)\
-#         .first()
+def get_turnos_by_usuario(db: Session, usuario_id: uuid.UUID):
+    usuario = db.query(UserModel).filter(UserModel.uuidUsuario == usuario_id).first()
     
-#     if not turno:
-#         raise HTTPException(status_code=404, detail="Turno no encontrado")
-#     return turno
+    if not usuario:
+        raise HTTPException(status_code=404, detail="Usuario no encontrado")
+    
+    
+    turnos = db.query(TurnoModel)\
+    .join(TurnoVehiculos, TurnoModel.uuidTurno == TurnoVehiculos.turno_id)\
+    .join(VehiculoModel, TurnoVehiculos.vehiculo_id == VehiculoModel.uuidvehiculo)\
+    .filter(VehiculoModel.usuario_id == usuario_id)\
+    .all()
+    
+    if not turnos:
+        raise HTTPException(status_code=404, detail="No se encontraron turnos para este usuario")
+    
+    return turnos
