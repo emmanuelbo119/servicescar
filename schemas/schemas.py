@@ -17,7 +17,6 @@ class UsuarioBase(BaseModel):
     def validate_email(cls, v):
         return v
 
-
 class UsuarioCreate(UsuarioBase):
     contraseña: str
 
@@ -97,48 +96,8 @@ class Vehiculo(VehiculoBase):
     class Config:
         orm_mode = True
 
-
-
-
-
  
 ## ------------------------------------------Mantenimiento  ----------------------------------------------------------------
-
-
-class EstadoMantenimientoBase(BaseModel):
-    nombre: str
-    descripcion: Optional[str] = None
-
-class EstadoMantenimientoCreate(EstadoMantenimientoBase):
-    pass
-
-class EstadoMantenimiento(EstadoMantenimientoBase):
-    uuidestadomantenimiento: UUID
-
-    class Config:
-        orm_mode = True
-
-
-class MantenimientoBase(BaseModel):
-    fecha: datetime
-    hora: datetime
-    duracion: int
-    servicio: str
-    descripcion: str
-    costo: float
-    observacionesadicionales: Optional[str] = None
-    uuidTallerMecanico: Optional[UUID] = None
-    estado: Optional[UUID] = None
-
-class MantenimientoCreate(MantenimientoBase):
-    pass
-
-class Mantenimiento(MantenimientoBase):
-    uuidmantenimiento: UUID
-
-    class Config:
-        orm_mode = True
-
 
 class TallerMecanicoBase(BaseModel):
     nombre: str
@@ -201,14 +160,17 @@ class TurnoBase(BaseModel):
     uuidTallerMecanico: UUID
     uuidEstadoTurno: UUID
     estado:EstadoTurnoBase
-
+    vehiculo: List[VehiculoBase] =[]
+    cupo: Optional[int] = 1  
  
 class TurnoCreate(TurnoBase):
     pass
 
 class TurnoResponseReserva(TurnoBase):
     uuidTurno: UUID
-    taller_mecanico: TallerMecanico 
+    taller_mecanico: TallerMecanico
+    vehiculos:List[Vehiculo]
+
 
 class Turno(TurnoBase):
     uuidTurno: UUID

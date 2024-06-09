@@ -31,14 +31,12 @@ def create_turnos(
     horaInicio: time,
     horaFin: time,
     intervalo: int,
+    cupo: int,
     db: Session = Depends(get_db)
 ):
-    return turnos_controller.generate_turnos(tallermecanico_id, fechaInicio, fechaFin, horaInicio, horaFin, intervalo, db)
+    return turnos_controller.generate_turnos(tallermecanico_id, fechaInicio, fechaFin, horaInicio, horaFin, intervalo,cupo, db)
 
 
-@router.post("/{turno_id}/reservar", response_model=TurnoResponseReserva)
-def reservar_turno(turno_id: UUID, db: Session = Depends(get_db)):
-    return turnos_controller.reservarTurno(db, turno_id)
 
 @router.get("/{turno_id}", response_model=List[Turno])
 async def getTurnoByID(turno_id: UUID, db: Session = Depends(get_db)):
@@ -46,10 +44,11 @@ async def getTurnoByID(turno_id: UUID, db: Session = Depends(get_db)):
 
 
 @router.post("/{turno_id}/reservar", response_model=TurnoResponseReserva)
-async def reservar_turno(turno_id: UUID, db: Session = Depends(get_db)):
-    return turnos_controller.reservarTurno(db, turno_id)
+async def reservar_turno(turno_id: UUID,vehiculo_id: UUID, db: Session = Depends(get_db)):
+    return turnos_controller.reservarTurno(db, turno_id,vehiculo_id)
 
 
 @router.get("/{user_id}", response_model=TurnoResponseReserva)
 async def get_turno_by_user(user_id: UUID, db: Session = Depends(get_db)):
     return turnos_controller.get_turno_by_user(db, user_id)
+

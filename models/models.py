@@ -1,10 +1,18 @@
-from sqlalchemy import Column, Enum, Float, ForeignKey, Integer, String, Text, Double, DateTime, func
+from sqlalchemy import Column, Enum, Float, ForeignKey, Integer, String, Table, Text, Double, DateTime, func
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 from datetime import datetime
 
 from database import Base
 import uuid
+
+
+class TurnoVehiculos(Base):
+    __tablename__ = "turno_vehiculos"
+    __table_args__ = {'extend_existing': True}
+    uuidTurnoVehiculo = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    turno_id = Column(UUID(as_uuid=True), ForeignKey("turnos.uuidTurno"))
+    vehiculo_id = Column(UUID(as_uuid=True), ForeignKey("vehiculos.uuidvehiculo"))
 
 class Usuario(Base):
     __tablename__ = "usuarios"
@@ -47,76 +55,14 @@ class ModeloVehiculo(Base):
     # Relaciones
     marca = relationship("MarcaVehiculo", back_populates="modelos")
 
-class Vehiculo(Base):
-    __tablename__ = "vehiculos"
-    __table_args__ = {'extend_existing': True} 
-    uuidvehiculo = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    modelo_id = Column(UUID(as_uuid=True), ForeignKey("modelo_vehiculos.uuidmodelovehiculo"))
-    color = Column(String)
-    patente = Column(String, nullable=True)
-    anio = Column(String)
-    usuario_id = Column(UUID(as_uuid=True), ForeignKey("usuarios.uuidUsuario"))
-    marca_id = Column(UUID(as_uuid=True), ForeignKey("marca_vehiculos.uuidmarcavehiculo"))
-    fechaCreacion = Column(DateTime, nullable=False, default=datetime.utcnow)
-    fechaModificacion = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-    ##usuarios= relationship("Usuario",backref="usuarios")
-    
-    # Relaciones
-    modelo = relationship("ModeloVehiculo")
-    usuario = relationship("Usuario", back_populates="vehiculos")
-    mantenimientos = relationship("Mantenimiento", back_populates="vehiculo", cascade="all, delete-orphan")
-    marca = relationship("MarcaVehiculo", back_populates="vehiculos")
-
-class EstadoMantenimiento(Base):
-    __tablename__ = "estado_mantenimientos"
-    __table_args__ = {'extend_existing': True} 
-    uuidestadomantenimiento = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    nombre = Column(String(255), nullable=False)
-    descripcion = Column(Text)
-
-class Mantenimiento(Base):
-    __tablename__ = "mantenimientos"
-    __table_args__ = {'extend_existing': True} 
-    uuidmantenimiento = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    fecha = Column(DateTime, nullable=False)
-    hora = Column(DateTime, nullable=False)
-    duracion = Column(Integer, nullable=False)
-    servicio = Column(String(255), nullable=False)
-    descripcion = Column(Text, nullable=False)
-    costo = Column(Float, nullable=False)
-    observacionesadicionales = Column(Text)
-    tallermecanico_id = Column(UUID(as_uuid=True), ForeignKey("taller_mecanicos.uuidTallermecanico"))
-    estado = Column(UUID(as_uuid=True), ForeignKey("estado_mantenimientos.uuidestadomantenimiento"))
-    vehiculo_id = Column(UUID(as_uuid=True), ForeignKey("vehiculos.uuidvehiculo"), nullable=False)
-    usuario_id =Column(UUID(as_uuid=True), ForeignKey("Usuarios.uuidusuarios"), nullable=False)
-    
-    # Relaciones
-    taller_mecanico = relationship("TallerMecanico")
-    estado_mantenimiento = relationship("EstadoMantenimiento")
-    vehiculo = relationship("Vehiculo", back_populates="mantenimientos")
-    usuario= relationship("Usuarios", back_populates="usuarios")
-
-class ServicioMantenimiento(Base):
-    __tablename__ = "servicio_mantenimientos"
-    __table_args__ = {'extend_existing': True} 
-    uuidserviciomantenimiento = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    nombre = Column(String(255), nullable=False)
-    descripcion = Column(Text, nullable=False)
-    tiposervicio = Column(UUID(as_uuid=True), ForeignKey("tipo_servicio_mantenimientos.uuidtiposerviciomantenimiento"))
-    uuidmantenimiento = Column(UUID(as_uuid=True), ForeignKey("mantenimientos.uuidmantenimiento"), nullable=False)
-    uuidrepuesto = Column(UUID(as_uuid=True), ForeignKey("repuestos.uuidrepuesto"))
-    tipo_servicio_mantenimiento = relationship("TipoServicioMantenimiento")
-    mantenimiento = relationship("Mantenimiento")
-
 
 class TallerMecanico(Base):
     __tablename__ = "taller_mecanicos"
-    __table_args__ = {'extend_existing': True} 
     uuidTallermecanico = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     nombre = Column(String(255), nullable=False)
     direccion = Column(String(255), nullable=False)
-    latitud = Column(Double, nullable=False)
-    longitud = Column(Double, nullable=False)
+    latitud = Column(Float, nullable=False)
+    longitud = Column(Float, nullable=False)
     horarioAtencion = Column(String(255), nullable=False)
     servicios = Column(Text)
     fechaCreacion = Column(DateTime(timezone=True), server_default=func.now())
@@ -130,35 +76,18 @@ class TipoServicioMantenimiento(Base):
     nombre = Column(String(255), nullable=False)
     descripcion = Column(Text)
 
-
-## entidad nueva agregar al diagrama de clases 
-
-
 class Turno(Base):
-  __tablename__ = "turnos"
-    __table_args__ = {'extend_existing': True}
+    __tablename__ = "turnos"
     uuidTurno = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     fecha = Column(DateTime, nullable=False)
     hora = Column(DateTime, nullable=False)
     uuidEstadoTurno = Column(UUID(as_uuid=True), ForeignKey("turnosEstados.uuidEstadoTurno"), nullable=False)
     uuidTallerMecanico = Column(UUID(as_uuid=True), ForeignKey("taller_mecanicos.uuidTallermecanico"), nullable=False)
-    taller_mecanico_id = relationship("TallerMecanico", back_populates="turnos")
-    duracion = Column(Integer, nullable=False)
-    servicio = Column(String(255), nullable=False)
-    descripcion = Column(Text, nullable=False)
-    costo = Column(Float, nullable=False)
-    observacionesadicionales = Column(Text)
-    vehiculo_id = Column(UUID(as_uuid=True), ForeignKey("vehiculos.uuidvehiculo"), nullable=False)
-    usuario_id =Column(UUID(as_uuid=True), ForeignKey("Usuarios.uuidusuarios"), nullable=False)
-    
-    # Relaciones
-    taller_mecanico = relationship("TallerMecanico")
-    vehiculo = relationship("Vehiculo", back_populates="mantenimientos")
-    usuario= relationship("Usuarios", back_populates="usuarios")
+    cupo=Column(Integer, nullable=False)
+
+    taller_mecanico = relationship("TallerMecanico", back_populates="turnos")
     estado = relationship("EstadoTurno", back_populates="turnos")
-
-
-
+    vehiculos = relationship("Vehiculo", secondary="turno_vehiculos", back_populates="turnos")
 
 class EstadoTurno(Base):
     __tablename__ = "turnosEstados"
@@ -167,3 +96,23 @@ class EstadoTurno(Base):
     nombre = Column(String(255), nullable=False)
     descripcion = Column(String(255), nullable=True)
     turnos = relationship("Turno", back_populates="estado")
+
+
+
+class Vehiculo(Base):
+    __tablename__ = "vehiculos"
+    uuidvehiculo = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    modelo_id = Column(UUID(as_uuid=True), ForeignKey("modelo_vehiculos.uuidmodelovehiculo"))
+    color = Column(String)
+    patente = Column(String, nullable=True)
+    anio = Column(String)
+    usuario_id = Column(UUID(as_uuid=True), ForeignKey("usuarios.uuidUsuario"))
+    marca_id = Column(UUID(as_uuid=True), ForeignKey("marca_vehiculos.uuidmarcavehiculo"))
+    fechaCreacion = Column(DateTime, nullable=False, default=datetime.utcnow)
+    fechaModificacion = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    # Relaciones
+    modelo = relationship("ModeloVehiculo")
+    usuario = relationship("Usuario", back_populates="vehiculos")
+    marca = relationship("MarcaVehiculo", back_populates="vehiculos")
+    turnos = relationship("Turno", secondary="turno_vehiculos", back_populates="vehiculos")

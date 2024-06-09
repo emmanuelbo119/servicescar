@@ -41,20 +41,6 @@ def getVehiculoById(db:Session, automovil_id:UUID):
     return db_car
 
 
-def get_mantenimientos(db: Session, automovil_id:UUID):
-    db_car = db.query(Vehiculo).filter(Vehiculo.uuidautomovil == automovil_id).first()
-
-def actualizarVehiculo(db: Session, automovil_id: UUID,automovil_updated: schemas.VehiculoCreate):
-    db_car = db.query(Vehiculo).get(automovil_id).first()
-    if db_car is None:
-        raise HTTPException(status_code=404, detail="Car not found")
-    db_car.update(automovil_updated=automovil_updated)
-
-    db.commit()
-    return db_car
-
-
-
 def get_vehiculos_by_user(user_id: UUID, db: Session) -> List[Vehiculo]:
     db_vehiculos = (
         db.query(Vehiculo)
@@ -65,7 +51,4 @@ def get_vehiculos_by_user(user_id: UUID, db: Session) -> List[Vehiculo]:
         )
         .all()
     )
-    if not db_vehiculos:
-        raise HTTPException(status_code=404, detail="User not found")
-    
     return db_vehiculos

@@ -40,13 +40,6 @@ def get_car(automovil_id: UUID, db: Session = Depends(get_db)):
     return vehiculos.getVehiculoById(automovil_id, db)
 
 
-@router.get("/{automovil_id}/mantenimientos/", response_model=List[schemas.MantenimientoBase])
-def get_mantenimientos_by_vehiculo(vehiculo_id: UUID, db: Session = Depends(get_db)):
-    mantenimientos = db.query(models.Mantenimiento).filter(models.Mantenimiento.vehiculo_id == vehiculo_id).all()
-    if not mantenimientos:
-        raise HTTPException(status_code=404, detail="Mantenimientos no encontrados para el vehículo proporcionado")
-    return mantenimientos
-
 
 
 @router.get("/{user_id}/vehiculos", response_model=List[schemas.Vehiculo])

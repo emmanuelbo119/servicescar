@@ -26,7 +26,7 @@ async def get_tallerMecanico(db: Session = Depends(get_db)):
 @router.get("/{tallerMecanico_id}", response_model=schemas.TallerMecanico)
 async def get_tallerMecanico(tallerMecanico_id: UUID, db: Session = Depends(get_db)):
     try:
-        tallerMecanico = db.query(models.TallerMecanico).get(tallerMecanico_id).first()
+        tallerMecanico = db.query(models.TallerMecanico).get(tallerMecanico_id)
         if not tallerMecanico:
             raise HTTPException(status_code=404, detail="TallerMecanico not found")
         return tallerMecanico
