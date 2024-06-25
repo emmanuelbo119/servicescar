@@ -82,7 +82,7 @@ class VehiculoBase(BaseModel):
     patente: Optional[str] = None
     anio: str
     marca_id:UUID
-    fechaCreacion: datetime
+    fechaCreacion: Optional[datetime]
     fechaModificacion: Optional[datetime]
 
 class VehiculoCreate(VehiculoBase):

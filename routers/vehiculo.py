@@ -26,13 +26,13 @@ def read_cars(db: Session = Depends(get_db)):
     return vehiculos.getVehiculos(db)
 
 
-@router.delete("/{automovil_id}",response_model=str)
+@router.delete("/{automovil_id}",response_model=schemas.VehiculoBase)
 def delete_car(automovil_id: UUID, db: Session = Depends(get_db)):
     return vehiculos.borrarVehiculo(automovil_id, db)
 
 @router.put("/{automovil_id}", response_model=schemas.Vehiculo)
 def update_car(automovil_id: UUID, updated_car: schemas.VehiculoCreate, db: Session = Depends(get_db)):
-    return vehiculos.actualizarVehiculo(automovil_id, updated_car, db)
+    return vehiculos.actualizar_vehiculo(automovil_id, updated_car, db)
 
 ##get by id 
 @router.get("/{automovil_id}", response_model=schemas.Vehiculo)
