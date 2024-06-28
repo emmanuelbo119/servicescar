@@ -1,6 +1,8 @@
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
 --Talleres mecanicos
 
-CREATE TABLE public.taller_mecanicos (
+CREATE TABLE IF NOT EXISTS public.taller_mecanicos (
 	"uuidTallermecanico" uuid DEFAULT uuid_generate_v4() NOT NULL,
 	nombre varchar(255) NOT NULL,
 	direccion varchar(255) NOT NULL,
@@ -30,7 +32,7 @@ INSERT INTO public.taller_mecanicos ("uuidTallermecanico",nombre,direccion,latit
 
 --Modelos vehiculos
 
-CREATE TABLE public.modelo_vehiculos (
+CREATE TABLE IF NOT EXISTS public.modelo_vehiculos (
 	uuidmodelovehiculo uuid DEFAULT gen_random_uuid() NOT NULL,
 	nombre varchar(255) NOT NULL,
 	descripcion text NULL,
@@ -111,7 +113,7 @@ INSERT INTO public.modelo_vehiculos (uuidmodelovehiculo,nombre,descripcion,"fech
 
 --Marcas vehiculos
 
-CREATE TABLE public.marca_vehiculos (
+CREATE TABLE IF NOT EXISTS public.marca_vehiculos (
 	uuidmarcavehiculo uuid DEFAULT uuid_generate_v4() NOT NULL,
 	nombre varchar(255) NOT NULL,
 	descripcion text NULL,
