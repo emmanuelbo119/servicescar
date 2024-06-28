@@ -1,5 +1,20 @@
 --Talleres mecanicos
 
+CREATE TABLE public.taller_mecanicos (
+	"uuidTallermecanico" uuid DEFAULT uuid_generate_v4() NOT NULL,
+	nombre varchar(255) NOT NULL,
+	direccion varchar(255) NOT NULL,
+	latitud float8 NOT NULL,
+	longitud float8 NOT NULL,
+	"horarioAtencion" varchar(255) NOT NULL,
+	servicios text NULL,
+	"fechaCreacion" timestamp NULL,
+	"fechaModificacion" timestamp NULL,
+	CONSTRAINT taller_mecanicos_pkey PRIMARY KEY ("uuidTallermecanico")
+);
+
+
+
 INSERT INTO public.taller_mecanicos ("uuidTallermecanico",nombre,direccion,latitud,longitud,"horarioAtencion",servicios,"fechaCreacion","fechaModificacion") VALUES
 	 ('299ac113-f80d-449e-ba62-5741edb51056','Taller Mecánico Los Andes','Av. Corrientes 1234, Buenos Aires',-34.603722,-58.381592,'Lunes a Viernes de 8:00 a 18:00','Cambio de aceite, Alineación y balanceo, Reparación de motores','2024-05-26 00:00:00','2024-05-26 00:00:00'),
 	 ('89b890ef-681b-40b4-a28f-c2a2750a9ebb','Taller Automotriz El Sol','Calle Falsa 123, Córdoba',-31.420083,-64.188776,'Lunes a Viernes de 9:00 a 19:00','Cambio de neumáticos, Frenos, Electricidad del automóvil','2024-05-26 00:00:00','2024-05-26 00:00:00'),
@@ -14,6 +29,21 @@ INSERT INTO public.taller_mecanicos ("uuidTallermecanico",nombre,direccion,latit
 
 
 --Modelos vehiculos
+
+CREATE TABLE public.modelo_vehiculos (
+	uuidmodelovehiculo uuid DEFAULT gen_random_uuid() NOT NULL,
+	nombre varchar(255) NOT NULL,
+	descripcion text NULL,
+	"fechaCreacion" timestamp NOT NULL,
+	"fechaModificacion" timestamp NULL,
+	marca_id uuid NULL,
+	CONSTRAINT modelo_vehiculos_pkey PRIMARY KEY (uuidmodelovehiculo)
+);
+
+
+-- public.modelo_vehiculos foreign keys
+
+ALTER TABLE public.modelo_vehiculos ADD CONSTRAINT modelo_vehiculos_marca_vehiculos_fk FOREIGN KEY (marca_id) REFERENCES public.marca_vehiculos(uuidmarcavehiculo);
 
 INSERT INTO public.modelo_vehiculos (uuidmodelovehiculo,nombre,descripcion,"fechaCreacion","fechaModificacion",marca_id) VALUES
 	 ('070924a1-0bc4-4301-87b7-28a948783c4d','Aveo',NULL,'2024-05-26 00:00:00','2024-05-26 00:00:00','c14d5506-f559-4183-b1ac-866bd22a35e4'),
@@ -80,6 +110,16 @@ INSERT INTO public.modelo_vehiculos (uuidmodelovehiculo,nombre,descripcion,"fech
 
 
 --Marcas vehiculos
+
+CREATE TABLE public.marca_vehiculos (
+	uuidmarcavehiculo uuid DEFAULT uuid_generate_v4() NOT NULL,
+	nombre varchar(255) NOT NULL,
+	descripcion text NULL,
+	fechacreacion timestamp NOT NULL,
+	fechamodificacion timestamp NULL,
+	CONSTRAINT marca_vehiculos_pkey PRIMARY KEY (uuidmarcavehiculo)
+);
+
 
 INSERT INTO public.marca_vehiculos (uuidmarcavehiculo,nombre,descripcion,fechacreacion,fechamodificacion) VALUES
 	 ('7984f267-7c07-456d-a09d-ff0b9d86ce21','Ford','','2024-05-23 00:00:00','2024-05-23 00:00:00'),
