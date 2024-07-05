@@ -1,0 +1,79 @@
+from sqlalchemy.orm import Session
+from fastapi import HTTPException
+from typing import List
+import uuid
+from app.models import models
+from app.schemas import schemas
+
+from passlib.context import CryptContext
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+def get_password_hash(password):
+    return pwd_context.hash(password)
+
+
+def create_user(user: schemas.UsuarioCreate, db: Session):
+    db_user = db.query(models.Usuario).filter(models.Usuario.email == user.email).first()
+    if db_user:
+        raise HTTPException(status_code=400, detail="Email already registered")
+    
+    db_user = models.Usuario(
+        nombre=user.nombre,
+        apellido=user.apellido,
+        dni=user.dni,
+        email=user.email,
+        contraseña=get_password_hash(user.contraseña),
+        edad=user.edad,
+        telefono=user.telefono,
+        username=user.username,
+    )
+    db.add(db_user)
+    db.commit()
+    db.refresh(db_user)
+    return db_user
+
+def get_user(user_id: uuid.UUID, db: Session):
+    db_user = db.query(models.Usuario).filter(models.Usuario.uuidusuario == user_id).first()
+    if db_user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+    return db_user
+
+def get_users(skip: int, limit: int, db: Session) -> List[models.Usuario]:
+    return db.query(models.Usuario).offset(skip).limit(limit).all()
+
+def delete_user(user_id: uuid.UUID, db: Session):
+    db_user = db.query(models.Usuario).filter(models.Usuario.uuidusuario == user_id).first()
+    if db_user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+    db.delete(db_user)
+    db.commit()
+    return db_user
+
+def update_user(user_id: uuid.UUID, updated_user: schemas.UsuarioCreate, db: Session):
+    db_user = db.query(models.Usuario).filter(models.Usuario.uuidusuario == user_id).first()
+    if db_user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    db_user.nombre = updated_user.nombre
+    db_user.apellido = updated_user.apellido
+    db_user.dni = updated_user.dni
+    db_user.email = updated_user.email
+    db_user.contraseña = get_password_hash(updated_user.contraseña),
+    db_user.edad = updated_user.edad
+    db_user.telefono = updated_user.telefono
+
+    db.commit()
+    db.refresh(db_user)
+    return db_user
+
+def reset_password(email: str, new_password: str, db: Session):
+    user = db.query(models.Usuario).filter(models.Usuario.email == email).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    user.contraseña = get_password_hash(new_password)
+    db.commit()
+    return {"msg": "Password reset successful"}
+    
+
