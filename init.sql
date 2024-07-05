@@ -1,22 +1,6 @@
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 --Talleres mecanicos
-
-CREATE TABLE IF NOT EXISTS public.taller_mecanicos (
-	"uuidTallermecanico" uuid DEFAULT uuid_generate_v4() NOT NULL,
-	nombre varchar(255) NOT NULL,
-	direccion varchar(255) NOT NULL,
-	latitud float8 NOT NULL,
-	longitud float8 NOT NULL,
-	"horarioAtencion" varchar(255) NOT NULL,
-	servicios text NULL,
-	"fechaCreacion" timestamp NULL,
-	"fechaModificacion" timestamp NULL,
-	CONSTRAINT taller_mecanicos_pkey PRIMARY KEY ("uuidTallermecanico")
-);
-
-
-
 INSERT INTO public.taller_mecanicos ("uuidTallermecanico",nombre,direccion,latitud,longitud,"horarioAtencion",servicios,"fechaCreacion","fechaModificacion") VALUES
 	 ('299ac113-f80d-449e-ba62-5741edb51056','Taller Mecánico Los Andes','Av. Corrientes 1234, Buenos Aires',-34.603722,-58.381592,'Lunes a Viernes de 8:00 a 18:00','Cambio de aceite, Alineación y balanceo, Reparación de motores','2024-05-26 00:00:00','2024-05-26 00:00:00'),
 	 ('89b890ef-681b-40b4-a28f-c2a2750a9ebb','Taller Automotriz El Sol','Calle Falsa 123, Córdoba',-31.420083,-64.188776,'Lunes a Viernes de 9:00 a 19:00','Cambio de neumáticos, Frenos, Electricidad del automóvil','2024-05-26 00:00:00','2024-05-26 00:00:00'),
@@ -30,23 +14,41 @@ INSERT INTO public.taller_mecanicos ("uuidTallermecanico",nombre,direccion,latit
 	 ('5927c22d-92a3-4ea9-8b63-928474208499','Taller Centro','Calle 10 234, Tucumán',-26.822,-65.207,'Lunes a Viernes de 8:00 a 18:00','Mecánica general, Diagnóstico computarizado, Cambio de aceite','2024-05-26 00:00:00','2024-05-26 00:00:00');
 
 
---Modelos vehiculos
 
-CREATE TABLE IF NOT EXISTS public.modelo_vehiculos (
-	uuidmodelovehiculo uuid DEFAULT gen_random_uuid() NOT NULL,
-	nombre varchar(255) NOT NULL,
-	descripcion text NULL,
-	"fechaCreacion" timestamp NOT NULL,
-	"fechaModificacion" timestamp NULL,
-	marca_id uuid NULL,
-	CONSTRAINT modelo_vehiculos_pkey PRIMARY KEY (uuidmodelovehiculo)
-);
+--Marcas Vehiculos
+INSERT INTO public.marca_vehiculos (uuidmarcavehiculo,nombre,descripcion,fechacreacion,fechamodificacion) VALUES
+	 ('7984f267-7c07-456d-a09d-ff0b9d86ce21','Ford','','2024-05-23 00:00:00','2024-05-23 00:00:00'),
+	 ('c14d5506-f559-4183-b1ac-866bd22a35e4','Chevrolet','','2024-05-23 00:00:00','2024-05-23 00:00:00'),
+	 ('563f3d67-2f97-40f3-807e-8b86de8e3efe','Toyota','','2024-05-23 00:00:00','2024-05-23 00:00:00'),
+	 ('3bdf2d0e-c5b5-428b-98c6-6e64cc872c09','Volkswagen','','2024-05-23 00:00:00','2024-05-23 00:00:00'),
+	 ('b41c181b-81ac-4aaf-b425-9190867294df','Renault','','2024-05-23 00:00:00','2024-05-23 00:00:00'),
+	 ('bdf03fc7-90c8-4d8c-91c0-0d126575d4d9','Peugeot','','2024-05-23 00:00:00','2024-05-23 00:00:00'),
+	 ('2171bf92-ddc4-4352-accc-a06c64c809c0','Fiat','','2024-05-23 00:00:00','2024-05-23 00:00:00'),
+	 ('a64e75e8-4a72-4c92-96c3-e520aa400653','Citroën','','2024-05-23 00:00:00','2024-05-23 00:00:00'),
+	 ('3e807e0c-5a39-47f6-9d03-347f1b7bdbb9','Nissan','','2024-05-23 00:00:00','2024-05-23 00:00:00'),
+	 ('69ec8d22-72ab-4b8c-bb0d-7905a1995d73','Honda','','2024-05-23 00:00:00','2024-05-23 00:00:00');
+INSERT INTO public.marca_vehiculos (uuidmarcavehiculo,nombre,descripcion,fechacreacion,fechamodificacion) VALUES
+	 ('8b6ac0ba-0d63-455d-987e-e69ac5da065d','Hyundai','','2024-05-23 00:00:00','2024-05-23 00:00:00'),
+	 ('3715d7d3-2267-4e8b-a908-b1c8196d02b4','Kia','','2024-05-23 00:00:00','2024-05-23 00:00:00'),
+	 ('4a5d7ca9-ef3c-4a89-92f3-82f1b15e3a1d','Jeep','','2024-05-23 00:00:00','2024-05-23 00:00:00'),
+	 ('c4bd9b3c-5b64-413a-a584-a44a544577f1','Subaru','','2024-05-23 00:00:00','2024-05-23 00:00:00'),
+	 ('d9ca3966-c27b-4953-928c-4903f012c9d8','BMW','','2024-05-23 00:00:00','2024-05-23 00:00:00'),
+	 ('7a8e7a30-4dc5-4439-a847-1af0f033c939','Mercedes-Benz','','2024-05-23 00:00:00','2024-05-23 00:00:00'),
+	 ('85c2adb4-3e3f-463e-91b4-9ba03400e767','Audi','','2024-05-23 00:00:00','2024-05-23 00:00:00'),
+	 ('d8921b46-6e04-4293-ac98-b7edcb5e66f2','Mitsubishi','','2024-05-23 00:00:00','2024-05-23 00:00:00'),
+	 ('29c6b7a2-699e-4aca-a8a6-42de6c309a1c','Suzuki','','2024-05-23 00:00:00','2024-05-23 00:00:00'),
+	 ('7fa3131a-6936-43b0-a6d6-023d331557c2','Chery','','2024-05-23 00:00:00','2024-05-23 00:00:00');
+INSERT INTO public.marca_vehiculos (uuidmarcavehiculo,nombre,descripcion,fechacreacion,fechamodificacion) VALUES
+	 ('e4eda5fd-a7ed-468b-aa8b-bdceeff3b7fb','Toyota',NULL,'2024-05-24 03:03:34.10853','2024-05-24 03:03:34.108532'),
+	 ('d882afc3-caf2-4c1b-8bab-83d68fd0cc90','Renault',NULL,'2024-05-24 03:04:38.017642','2024-05-24 03:04:38.017644');
 
 
--- public.modelo_vehiculos foreign keys
 
-ALTER TABLE public.modelo_vehiculos ADD CONSTRAINT modelo_vehiculos_marca_vehiculos_fk FOREIGN KEY (marca_id) REFERENCES public.marca_vehiculos(uuidmarcavehiculo);
 
+
+
+
+--Modelos Vehiculos
 INSERT INTO public.modelo_vehiculos (uuidmodelovehiculo,nombre,descripcion,"fechaCreacion","fechaModificacion",marca_id) VALUES
 	 ('070924a1-0bc4-4301-87b7-28a948783c4d','Aveo',NULL,'2024-05-26 00:00:00','2024-05-26 00:00:00','c14d5506-f559-4183-b1ac-866bd22a35e4'),
 	 ('6761e03f-eee0-466c-bba9-ef5714418743','Spark',NULL,'2024-05-26 00:00:00','2024-05-26 00:00:00','c14d5506-f559-4183-b1ac-866bd22a35e4'),
@@ -108,46 +110,8 @@ INSERT INTO public.modelo_vehiculos (uuidmodelovehiculo,nombre,descripcion,"fech
 	 ('78b3916f-00e0-460e-891f-4b1baacfeac5','Qashqai',NULL,'2024-05-26 00:00:00','2024-05-26 00:00:00','3e807e0c-5a39-47f6-9d03-347f1b7bdbb9'),
 	 ('5cee9e20-4eb4-43f5-a1da-3e574efd8609','X-Trail',NULL,'2024-05-26 00:00:00','2024-05-26 00:00:00','3e807e0c-5a39-47f6-9d03-347f1b7bdbb9');
 
-
-
-
---Marcas vehiculos
-
-CREATE TABLE IF NOT EXISTS public.marca_vehiculos (
-	uuidmarcavehiculo uuid DEFAULT uuid_generate_v4() NOT NULL,
-	nombre varchar(255) NOT NULL,
-	descripcion text NULL,
-	fechacreacion timestamp NOT NULL,
-	fechamodificacion timestamp NULL,
-	CONSTRAINT marca_vehiculos_pkey PRIMARY KEY (uuidmarcavehiculo)
-);
-
-
-INSERT INTO public.marca_vehiculos (uuidmarcavehiculo,nombre,descripcion,fechacreacion,fechamodificacion) VALUES
-	 ('7984f267-7c07-456d-a09d-ff0b9d86ce21','Ford','','2024-05-23 00:00:00','2024-05-23 00:00:00'),
-	 ('c14d5506-f559-4183-b1ac-866bd22a35e4','Chevrolet','','2024-05-23 00:00:00','2024-05-23 00:00:00'),
-	 ('563f3d67-2f97-40f3-807e-8b86de8e3efe','Toyota','','2024-05-23 00:00:00','2024-05-23 00:00:00'),
-	 ('3bdf2d0e-c5b5-428b-98c6-6e64cc872c09','Volkswagen','','2024-05-23 00:00:00','2024-05-23 00:00:00'),
-	 ('b41c181b-81ac-4aaf-b425-9190867294df','Renault','','2024-05-23 00:00:00','2024-05-23 00:00:00'),
-	 ('bdf03fc7-90c8-4d8c-91c0-0d126575d4d9','Peugeot','','2024-05-23 00:00:00','2024-05-23 00:00:00'),
-	 ('2171bf92-ddc4-4352-accc-a06c64c809c0','Fiat','','2024-05-23 00:00:00','2024-05-23 00:00:00'),
-	 ('a64e75e8-4a72-4c92-96c3-e520aa400653','Citroën','','2024-05-23 00:00:00','2024-05-23 00:00:00'),
-	 ('3e807e0c-5a39-47f6-9d03-347f1b7bdbb9','Nissan','','2024-05-23 00:00:00','2024-05-23 00:00:00'),
-	 ('69ec8d22-72ab-4b8c-bb0d-7905a1995d73','Honda','','2024-05-23 00:00:00','2024-05-23 00:00:00');
-INSERT INTO public.marca_vehiculos (uuidmarcavehiculo,nombre,descripcion,fechacreacion,fechamodificacion) VALUES
-	 ('8b6ac0ba-0d63-455d-987e-e69ac5da065d','Hyundai','','2024-05-23 00:00:00','2024-05-23 00:00:00'),
-	 ('3715d7d3-2267-4e8b-a908-b1c8196d02b4','Kia','','2024-05-23 00:00:00','2024-05-23 00:00:00'),
-	 ('4a5d7ca9-ef3c-4a89-92f3-82f1b15e3a1d','Jeep','','2024-05-23 00:00:00','2024-05-23 00:00:00'),
-	 ('c4bd9b3c-5b64-413a-a584-a44a544577f1','Subaru','','2024-05-23 00:00:00','2024-05-23 00:00:00'),
-	 ('d9ca3966-c27b-4953-928c-4903f012c9d8','BMW','','2024-05-23 00:00:00','2024-05-23 00:00:00'),
-	 ('7a8e7a30-4dc5-4439-a847-1af0f033c939','Mercedes-Benz','','2024-05-23 00:00:00','2024-05-23 00:00:00'),
-	 ('85c2adb4-3e3f-463e-91b4-9ba03400e767','Audi','','2024-05-23 00:00:00','2024-05-23 00:00:00'),
-	 ('d8921b46-6e04-4293-ac98-b7edcb5e66f2','Mitsubishi','','2024-05-23 00:00:00','2024-05-23 00:00:00'),
-	 ('29c6b7a2-699e-4aca-a8a6-42de6c309a1c','Suzuki','','2024-05-23 00:00:00','2024-05-23 00:00:00'),
-	 ('7fa3131a-6936-43b0-a6d6-023d331557c2','Chery','','2024-05-23 00:00:00','2024-05-23 00:00:00');
-INSERT INTO public.marca_vehiculos (uuidmarcavehiculo,nombre,descripcion,fechacreacion,fechamodificacion) VALUES
-	 ('e4eda5fd-a7ed-468b-aa8b-bdceeff3b7fb','Toyota',NULL,'2024-05-24 03:03:34.10853','2024-05-24 03:03:34.108532'),
-	 ('d882afc3-caf2-4c1b-8bab-83d68fd0cc90','Renault',NULL,'2024-05-24 03:04:38.017642','2024-05-24 03:04:38.017644');
-
-
+--Turnos Estados
+INSERT INTO public.turnosEstados ("uuidEstadoTurno",nombre,descripcion) VALUES
+	 ('4fe32397-4ba4-448b-9a62-4d5d01f971cd','Disponible','Turno libre para su reserva'),
+	 ('45f0d103-58cc-4d15-85bc-026c4ed39dcf','Ocupado','Turno reservado por un usuario');
 

@@ -15,6 +15,7 @@ def crearVehiculo(car: schemas.VehiculoBase, db: Session):
         color=car.color,
         patente=car.patente,
         usuario_id=car.usuario_id,
+        kilometraje=car.kilometraje,
         fechaCreacion= datetime.now(),
         fechaModificacion= datetime.now()
     )
@@ -64,6 +65,7 @@ def actualizar_vehiculo(automovil_id: UUID, updated_car: schemas.VehiculoCreate,
     db_car.anio = updated_car.anio
     db_car.color = updated_car.color
     db_car.patente = updated_car.patente
+    db_car.kilometraje = updated_car.kilometraje
     db_car.fechaModificacion = datetime.now()
     db.commit()
     db.refresh(db_car)

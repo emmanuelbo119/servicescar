@@ -68,7 +68,6 @@ def generate_turnos(tallermecanico_id, fechaInicio, fechaFin, horaInicio, horaFi
                 hora=current_time,
                 uuidEstadoTurno=estado_disponible.uuidEstadoTurno,
                 uuidTallerMecanico=tallermecanico_id,
-                uuidVehiculo=None,
                 cupo=cupo  
             )
             db.add(turno)
