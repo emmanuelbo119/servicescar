@@ -30,8 +30,6 @@ class Usuario(UsuarioBase):
 class MarcaVehiculoBase(BaseModel):
     nombre: str
     descripcion: Optional[str] = None
-    fechaCreacion: Optional[datetime] = None
-    fechaModificacion: Optional[datetime] = None
 
 class MarcaVehiculoCreate(MarcaVehiculoBase):
     pass
@@ -52,8 +50,6 @@ class MarcaVehiculoBasic(BaseModel):
 class ModeloVehiculoBase(BaseModel):
     nombre: str
     descripcion: Optional[str] = None
-    fechaCreacion: datetime
-    fechaModificacion: Optional[datetime] = None
     marca: MarcaVehiculoBase
 
 class ModeloVehiculoCreate(ModeloVehiculoBase):
@@ -80,8 +76,6 @@ class VehiculoBase(BaseModel):
     anio: str
     marca_id: UUID
     kilometraje: Optional[int] = 0
-    fechaCreacion: Optional[datetime]
-    fechaModificacion: Optional[datetime]
 
 class VehiculoCreate(VehiculoBase):
     pass
@@ -101,8 +95,6 @@ class TallerMecanicoBase(BaseModel):
     longitud: float
     horarioAtencion: str
     servicios: Optional[str] = None
-    fechaCreacion: Optional[datetime]
-    fechaModificacion: Optional[datetime]
 
 class TallerMecanicoCreate(TallerMecanicoBase):
     pass
@@ -126,35 +118,6 @@ class EstadoTurno(EstadoTurnoBase):
     class Config:
         orm_mode = True
 
-class TurnoBase(BaseModel):
-    fecha: datetime
-    hora: datetime
-    uuidTallerMecanico: UUID
-    uuidEstadoTurno: UUID
-    duracion: Optional[int] = 0
-    kilometraje_vehiculo: Optional[int] = 0
-    costo_total: Optional[float] = 0
-    descripcion: Optional [str] = None
-    estado: EstadoTurnoBase
-    vehiculos: List[VehiculoBase] = []
-    cupo: Optional[int] = 1
-    detalles: List['DetalleMantenimiento'] = []
-
-class TurnoCreate(TurnoBase):
-    pass
-
-class TurnoResponseReserva(TurnoBase):
-    uuidTurno: UUID
-    taller_mecanico: TallerMecanico
-    vehiculos: List[Vehiculo]
-
-class Turno(TurnoBase):
-    uuidTurno: UUID
-    detalles: List['DetalleMantenimiento'] = []
-
-    class Config:
-        orm_mode = True
-
 class DetalleMantenimientoBase(BaseModel):
     tipo: str
     descripcion: str
@@ -163,14 +126,6 @@ class DetalleMantenimientoBase(BaseModel):
 
 class DetalleMantenimientoCreate(DetalleMantenimientoBase):
     pass
-
-class DetalleMantenimiento(DetalleMantenimientoBase):
-    uuidDetalle: UUID
-    tarea_manual: Optional['TareaManual']
-    repuesto: Optional['Repuesto']
-
-    class Config:
-        orm_mode = True
 
 class TareaManualBase(BaseModel):
     descripcion_tarea: str
@@ -198,6 +153,51 @@ class Repuesto(RepuestoBase):
     class Config:
         orm_mode = True
 
+class DetalleMantenimiento(DetalleMantenimientoBase):
+    uuidDetalle: UUID
+    tarea_manual: Optional[TareaManual]
+    repuesto: Optional[Repuesto]
+
+    class Config:
+        orm_mode = True
+
+class EstadoMantenimientoBase(BaseModel):
+    uuidEstadoMantenimiento: UUID
+    nombre: str
+
+
+
+
+class TurnoBase(BaseModel):
+    fecha: datetime
+    hora: datetime
+    uuidTallerMecanico: UUID
+    uuidEstadoTurno: UUID
+    duracion: Optional[int] = 0
+    kilometraje: Optional[int] = 0
+    costo_total: Optional[float] = 0
+    descripcion: Optional [str] = None
+    estado: EstadoTurnoBase
+    vehiculos: List[Vehiculo] = []
+    cupo: Optional[int] = 1
+    detalles: List[DetalleMantenimiento] = []
+
+class TurnoCreate(TurnoBase):
+    pass
+
+class TurnoResponseReserva(TurnoBase):
+    uuidTurno: UUID
+    taller_mecanico: TallerMecanico
+    estadoMantenimiento: EstadoMantenimientoBase
+    class Config:
+        orm_mode = True
+
+class Turno(TurnoBase):
+    uuidTurno: UUID
+    detalles: List[DetalleMantenimiento] = []
+
+    class Config:
+        orm_mode = True
 
 class EmailPasswordRequestForm(BaseModel):
     email: str
