@@ -9,6 +9,7 @@ from app.models import TallerMecanico as TallerMecanicoModelModel
 from app.models import Usuario as UserModel
 from app.models import MarcaVehiculo as MarcaModel
 from app.models import ModeloVehiculo as ModeloVehiculoModel
+from app.models import EstadoMantenimiento as EstadoMantenimientoModel
 from app.models.models import TurnoVehiculos
 from app.schemas import schemas
 import uuid
@@ -51,6 +52,10 @@ def generate_turnos(tallermecanico_id, fechaInicio, fechaFin, horaInicio, horaFi
     if not estado_disponible:
         raise HTTPException(status_code=404, detail="Estado 'Disponible' no encontrado")
     
+    estado_mantenimiento_solicitado= db.query(EstadoMantenimientoModel).filter(EstadoMantenimientoModel.nombre == 'Solicitado').first()
+    if not estado_mantenimiento_solicitado:
+        raise HTTPException(status_code=404, detail="Estado 'Solicitado' no encontrado")
+    
     if not cupo:
         cupo = 1
     
@@ -68,7 +73,11 @@ def generate_turnos(tallermecanico_id, fechaInicio, fechaFin, horaInicio, horaFi
                 hora=current_time,
                 uuidEstadoTurno=estado_disponible.uuidEstadoTurno,
                 uuidTallerMecanico=tallermecanico_id,
-                cupo=cupo  
+                cupo=cupo,
+                costo_total=0 ,
+                descripcion="",
+                uuidEstadoMantenimiento=estado_mantenimiento_solicitado.uuidEstadoMantenimiento
+
             )
             db.add(turno)
             turnos.append(turno)

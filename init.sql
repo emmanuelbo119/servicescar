@@ -115,3 +115,14 @@ INSERT INTO public.turnosEstados ("uuidEstadoTurno",nombre,descripcion) VALUES
 	 ('4fe32397-4ba4-448b-9a62-4d5d01f971cd','Disponible','Turno libre para su reserva'),
 	 ('45f0d103-58cc-4d15-85bc-026c4ed39dcf','Ocupado','Turno reservado por un usuario');
 
+
+INSERT INTO public.estado_mantenimiento ("uuidEstadoMantenimiento", nombre, descripcion)
+VALUES
+    ('uuid_generate_v4()', 'Solicitado', 'Estado inicial cuando se solicita el mantenimiento'),
+    ('uuid_generate_v4()', 'Confirmado', 'Estado cuando el mantenimiento ha sido confirmado'),
+    ('uuid_generate_v4()', 'En proceso de presupuesto', 'Estado durante el cual se está elaborando el presupuesto'),
+    ('uuid_generate_v4()', 'Presupuestado', 'Estado cuando el presupuesto ha sido elaborado y está a la espera de aceptación'),
+    ('uuid_generate_v4()', 'Cancelado', 'Estado cuando el mantenimiento ha sido cancelado'),
+    ('uuid_generate_v4()', 'En proceso', 'Estado cuando el presupuesto ha sido aceptado y el mantenimiento está en curso'),
+    ('uuid_generate_v4()', 'Pausado', 'Estado cuando el mantenimiento ha sido pausado'),
+    ('uuid_generate_v4()', 'Completado', 'Estado cuando el mantenimiento ha sido completado');

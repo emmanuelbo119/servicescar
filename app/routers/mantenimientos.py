@@ -6,7 +6,8 @@ import uuid
 from app import models
 from app import schemas
 from app.database import get_db
-
+from app.models.models import DetalleMantenimiento, Turno
+from app.controllers import mantenimientos  as  mantenimientos_controller
 
 
 
@@ -17,24 +18,19 @@ router = APIRouter(
     
 )
 
+@router.post("/turnos/{turno_id}/detalles", response_model=schemas.DetalleMantenimiento)
+async def agregar_detalle_mantenimiento(turno_id: uuid.UUID, detalle: schemas.DetalleMantenimientoCreate, db: Session = Depends(get_db)):
+    detalle = mantenimientos_controller.agregar_detalle_mantenimiento(turno_id, detalle, Session)
+    return detalle
 
 
-@router.post("/", response_model=schemas.Mantenimiento)
-def create_mantenimiento(mantenimiento: schemas.MantenimientoCreate, db: Session = Depends(get_db)):
-    db_mantenimiento = models.Mantenimiento(**mantenimiento.dict())
-    db.add(db_mantenimiento)
-    db.commit()
-    db.refresh(db_mantenimiento)
-    return db_mantenimiento
+@router.delete("/turnos/{turno_id}/detalles/{detalle_id}", response_model=schemas.DetalleMantenimiento)
+async def eliminar_detalle_mantenimiento(turno_id: uuid.UUID, detalle_id: uuid.UUID, db: Session = Depends(get_db)):
+    detalle = mantenimientos_controller.eliminar_detalle_mantenimiento(turno_id, detalle_id, db)
+    return detalle
 
-@router.put("/{mantenimiento_id}", response_model=schemas.Mantenimiento)
-def update_mantenimiento(mantenimiento_id: uuid.UUID, updated_mantenimiento: schemas.MantenimientoUpdate, db: Session = Depends(get_db)):
-    db_mantenimiento = db.query(models.Mantenimiento).filter(models.Mantenimiento.id == mantenimiento_id).first()
-    if db_mantenimiento is None:
-        raise HTTPException(status_code=404, detail="Mantenimiento not found")
-    db_mantenimiento.descripcion = updated_mantenimiento.descripcion
-    db_mantenimiento.fecha = updated_mantenimiento.fecha
-    db.commit()
-    db.refresh(db_mantenimiento)
-    return db_mantenimiento
-    
+
+@router.put("/turnos/{turno_id}/finalizar-presupuesto", response_model=schemas.Turno)
+async def finalizar_presupuesto(turno_id: uuid.UUID, db: Session = Depends(get_db)):
+    turno = mantenimientos_controller.finalizar_presupuesto(turno_id, db)
+    return turno

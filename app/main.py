@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from app.routers import auth, modelo_vehiculo,marca_vehiculo, usuarios, vehiculo,taller_mecanico,turnos
+from app.routers import auth, modelo_vehiculo,marca_vehiculo, usuarios, vehiculo,taller_mecanico,turnos,mantenimientos
 from app.models import models
 from app.schemas import schemas
 from app.database import engine
@@ -16,6 +16,8 @@ app.include_router(marca_vehiculo.router)
 app.include_router(modelo_vehiculo.router)
 app.include_router(taller_mecanico.router)
 app.include_router(turnos.router)
+app.include_router(mantenimientos.router)
+
 
 # Configuración de CORS
 app.add_middleware(
