@@ -1,11 +1,11 @@
 from datetime import date, datetime, time
 from fastapi import APIRouter,Depends, HTTPException
 from sqlalchemy.orm import Session 
-from app.schemas import TurnoResponseReserva,Turno
+from app.schemas import TurnoResponseReserva,Turno,TurnoREsponseDetail
 from typing import List 
 from app.database import SessionLocal, engine, get_db
 from uuid import UUID
-from app.controllers import turnos as turnos_controller
+from app.controllers import turnos as turnos_controller,zoho_billing
 from app.schemas import TurnoBase
 
 
@@ -38,7 +38,7 @@ def create_turnos(
 
 
 
-@router.get("/{turno_id}", response_model=List[Turno])
+@router.get("/{turno_id}", response_model=List[TurnoREsponseDetail])
 async def getTurnoByID(turno_id: UUID, db: Session = Depends(get_db)):
     return turnos_controller.get_turnosById(db, turno_id)
 
@@ -51,3 +51,14 @@ async def reservar_turno(turno_id: UUID,vehiculo_id: UUID, db: Session = Depends
 @router.get("/{usuario_id}/turnos", response_model=List[TurnoResponseReserva])
 async def get_turnos_by_usuario(usuario_id: UUID, db: Session = Depends(get_db)):
     return turnos_controller.get_turnos_by_usuario(db, usuario_id)
+
+
+
+@router.post("/{turno_id}/", response_model=TurnoResponseReserva)
+async def pagar_turnos_(turno_id: UUID, db: Session = Depends(get_db)):
+    return turnos_controller.pagar_turno(db, turno_id)
+
+
+@router.post("/{turno_id}/crear_factura")
+async def crear_factura_turno(turno_id: UUID, db: Session = Depends(get_db)):
+    return zoho_billing.crear_factura_from_turno(db,turno_id,5364125000000089552,5375979000000088100,'2024-08-03')

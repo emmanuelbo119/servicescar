@@ -1,4 +1,5 @@
 from typing import List
+import requests
 from sqlalchemy.orm import Session,joinedload
 from fastapi import HTTPException
 from datetime import date, datetime, time, timedelta
@@ -9,6 +10,7 @@ from app.models import TallerMecanico as TallerMecanicoModelModel
 from app.models import Usuario as UserModel
 from app.models import MarcaVehiculo as MarcaModel
 from app.models import ModeloVehiculo as ModeloVehiculoModel
+from app.models import EstadoMantenimiento as EstadoMantenimientoModel
 from app.models.models import TurnoVehiculos
 from app.schemas import schemas
 import uuid
@@ -51,6 +53,10 @@ def generate_turnos(tallermecanico_id, fechaInicio, fechaFin, horaInicio, horaFi
     if not estado_disponible:
         raise HTTPException(status_code=404, detail="Estado 'Disponible' no encontrado")
     
+    estado_mantenimiento_solicitado= db.query(EstadoMantenimientoModel).filter(EstadoMantenimientoModel.nombre == 'Solicitado').first()
+    if not estado_mantenimiento_solicitado:
+        raise HTTPException(status_code=404, detail="Estado 'Solicitado' no encontrado")
+    
     if not cupo:
         cupo = 1
     
@@ -68,8 +74,11 @@ def generate_turnos(tallermecanico_id, fechaInicio, fechaFin, horaInicio, horaFi
                 hora=current_time,
                 uuidEstadoTurno=estado_disponible.uuidEstadoTurno,
                 uuidTallerMecanico=tallermecanico_id,
-                uuidVehiculo=None,
-                cupo=cupo  
+                cupo=cupo,
+                costo_total=0 ,
+                descripcion="",
+                uuidEstadoMantenimiento=estado_mantenimiento_solicitado.uuidEstadoMantenimiento
+
             )
             db.add(turno)
             turnos.append(turno)
@@ -79,13 +88,11 @@ def generate_turnos(tallermecanico_id, fechaInicio, fechaFin, horaInicio, horaFi
     db.commit()
     return turnos
 
-
-
 def reservarTurno(db: Session, turno_id: uuid.UUID, vehiculo_id: uuid.UUID):
     turno = db.query(TurnoModel)\
         .filter(TurnoModel.uuidTurno == turno_id)\
         .options(
-            joinedload(TurnoModel.vehiculos).joinedload(VehiculoModel.modelo).joinedload(ModeloVehiculoModel.marca),
+            joinedload(TurnoModel.vehiculos_relacionados).joinedload(TurnoVehiculos.vehiculo).joinedload(VehiculoModel.modelo).joinedload(ModeloVehiculoModel.marca),
             joinedload(TurnoModel.taller_mecanico),
             joinedload(TurnoModel.estado)
         )\
@@ -94,40 +101,107 @@ def reservarTurno(db: Session, turno_id: uuid.UUID, vehiculo_id: uuid.UUID):
     if not turno:
         raise HTTPException(status_code=404, detail="Turno no encontrado")
     
-    # Verificar si el turno está ocupado
     if turno.estado.nombre != 'Disponible':
         raise HTTPException(status_code=400, detail="Turno no disponible")
     
-    # Verificar si hay cupos disponibles
     if turno.cupo <= 0:
         raise HTTPException(status_code=400, detail="No hay cupos disponibles")
     
-    # Disminuir el cupo en 1
     turno.cupo -= 1
 
-    # Asignar el vehiculo al turno
     vehiculo = db.query(VehiculoModel).filter(VehiculoModel.uuidvehiculo == vehiculo_id).first()
     if not vehiculo:
         raise HTTPException(status_code=404, detail=f"Vehiculo {vehiculo_id} no encontrado")
+    
+    turno_vehiculo = TurnoVehiculos(uuidTurno=turno_id, uuidVehiculo=vehiculo_id)
     try:
-        turno.vehiculos.append(vehiculo)
+        db.add(turno_vehiculo)
     except Exception as e:
         raise HTTPException(status_code=400, detail="Error al asignar vehiculo al turno: " + str(e))
-    
 
-    # Verificar si el contador de cupo queda en 0 y marcar el turno como ocupado
     if turno.cupo == 0:
         estado_ocupado = db.query(EstadoTurnoModel).filter(EstadoTurnoModel.nombre == 'Ocupado').first()
         if not estado_ocupado:
             raise HTTPException(status_code=404, detail="Estado 'Ocupado' no encontrado")
         turno.estado = estado_ocupado
-    
-    # Guardar los cambios en la base de datos
+        estado_mantenimiento_solicitado= db.query(EstadoMantenimientoModel).filter(EstadoMantenimientoModel.nombre == 'Solicitado').first()
+        if not estado_mantenimiento_solicitado:
+            raise HTTPException(status_code=404, detail="Estado 'Solicitado' no encontrado")
+        turno.estadoMantenimiento = estado_mantenimiento_solicitado
     db.commit()
     db.refresh(turno)
-    
-    return turno
 
+    vehiculos = db.query(VehiculoModel).join(TurnoVehiculos).filter(TurnoVehiculos.uuidTurno == turno.uuidTurno).all()
+    
+    estado_turno_dict = {
+        "uuidEstadoTurno": turno.estado.uuidEstadoTurno,
+        "nombre": turno.estado.nombre,
+        "descripcion": turno.estado.descripcion
+    }
+
+    taller_mecanico_dict = {
+        "uuidTallermecanico": turno.taller_mecanico.uuidTallermecanico,
+        "nombre": turno.taller_mecanico.nombre,
+        "direccion": turno.taller_mecanico.direccion,
+        "latitud": turno.taller_mecanico.latitud,
+        "longitud": turno.taller_mecanico.longitud,
+        "horarioAtencion": turno.taller_mecanico.horarioAtencion,
+        "servicios": turno.taller_mecanico.servicios
+    }
+
+    vehiculos_dict = [
+        {
+            "uuidvehiculo": vehiculo.uuidvehiculo,
+            "modelo_id": vehiculo.modelo_id,
+            "usuario_id": vehiculo.usuario_id,
+            "color": vehiculo.color,
+            "patente": vehiculo.patente,
+            "anio": vehiculo.anio,
+            "marca_id": vehiculo.marca_id,
+            "kilometraje": vehiculo.kilometraje,
+            "marca": {
+                "uuidmarcavehiculo": vehiculo.marca.uuidmarcavehiculo,
+                "nombre": vehiculo.marca.nombre,
+                "descripcion": vehiculo.marca.descripcion
+            },
+            "modelo": {
+                "uuidmodelovehiculo": vehiculo.modelo.uuidmodelovehiculo,
+                "nombre": vehiculo.modelo.nombre,
+                "descripcion": vehiculo.modelo.descripcion
+            }
+        }
+        for vehiculo in vehiculos
+    ]
+
+    detalles_dict = [
+        {
+            "uuidDetalle": detalle.uuidDetalle,
+            "tipo": detalle.tipo,
+            "descripcion": detalle.descripcion,
+            "cantidad": detalle.cantidad,
+            "costo_unitario": detalle.costo_unitario
+        }
+        for detalle in turno.detalles
+    ]
+
+    turno_response = schemas.TurnoResponseReserva(
+        uuidTurno=turno.uuidTurno,
+        taller_mecanico=taller_mecanico_dict,
+        vehiculos=vehiculos_dict,
+        fecha=turno.fecha,
+        hora=turno.hora,
+        uuidTallerMecanico=turno.uuidTallerMecanico,
+        uuidEstadoTurno=turno.uuidEstadoTurno,
+        duracion=turno.duracion,
+        kilometraje_vehiculo=turno.kilometraje_vehiculo,
+        costo_total=turno.costo_total,
+        descripcion=turno.descripcion,
+        estado=estado_turno_dict,
+        cupo=turno.cupo,
+        detalles=detalles_dict
+    )
+    
+    return turno_response
 
 
 def get_turnos(db: Session, skip: int, limit: int):
@@ -135,14 +209,16 @@ def get_turnos(db: Session, skip: int, limit: int):
     return turnos
 
 def get_turnosById(db: Session,turno_id:uuid.UUID):
-    turnos = db.query(TurnoModel).filter(TurnoModel.uuidTurno == turno_id)
+    turnos = db.query(TurnoModel).filter(TurnoModel.uuidTurno == turno_id)\
+    .join(TurnoVehiculos,TurnoVehiculos.uuidTurno == TurnoModel.uuidTurno)\
+    .join(VehiculoModel, TurnoVehiculos.uuidVehiculo == VehiculoModel.uuidvehiculo)
     return turnos
 
 
 
 
 def CancelarTurno(db: Session, turno_id: uuid.UUID):
-    # Obtener el turno por su ID
+
     turno = db.query(TurnoModel)\
         .filter(TurnoModel.uuidTurno == turno_id)\
         .first()
@@ -150,16 +226,12 @@ def CancelarTurno(db: Session, turno_id: uuid.UUID):
     if not turno:
         raise HTTPException(status_code=404, detail="Turno no encontrado")
     
-    # Verificar el estado actual del turno usando la relación estado
     if turno.estado.nombre != 'Ocupado':
         raise HTTPException(status_code=400, detail="Turno Disponble, no se puede cancelar")
 
-    # Obtener el objeto del estado 'Ocupado'
     estado_ocupado = db.query(EstadoTurnoModel).filter(EstadoTurnoModel.nombre == 'Disponible').first()
     if not estado_ocupado:
         raise HTTPException(status_code=404, detail="Estado 'Disponible' no encontrado")
-    
-    # Actualizar el estado del turno usando la relación ORM
     turno.estado = estado_ocupado
     db.commit()
     db.refresh(turno)
@@ -167,18 +239,15 @@ def CancelarTurno(db: Session, turno_id: uuid.UUID):
 
 
 def get_turnos_by_usuario(db: Session, usuario_id: uuid.UUID):
-    usuario = db.query(UserModel).filter(UserModel.uuidUsuario == usuario_id).first()
-    
-    if not usuario:
-        raise HTTPException(status_code=404, detail="Usuario no encontrado")
-    
-    
     turnos = db.query(TurnoModel)\
-    .join(TurnoVehiculos, TurnoModel.uuidTurno == TurnoVehiculos.turno_id)\
-    .join(VehiculoModel, TurnoVehiculos.vehiculo_id == VehiculoModel.uuidvehiculo)\
-    .filter(VehiculoModel.usuario_id == usuario_id)\
-    .all()
-    
+        .join(TurnoVehiculos, TurnoModel.uuidTurno == TurnoVehiculos.uuidTurno)\
+        .join(VehiculoModel, TurnoVehiculos.uuidVehiculo == VehiculoModel.uuidvehiculo)\
+        .join(EstadoMantenimientoModel, EstadoMantenimientoModel.uuidEstadoMantenimiento == TurnoModel.uuidEstadoMantenimiento)\
+        .filter(VehiculoModel.usuario_id == usuario_id)\
+        .options(
+            joinedload(TurnoModel.estado),
+            joinedload(TurnoModel.taller_mecanico)
+        ).all()
     if not turnos:
         raise HTTPException(status_code=404, detail="No se encontraron turnos para este usuario")
     
