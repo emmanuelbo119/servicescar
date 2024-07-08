@@ -118,48 +118,36 @@ class EstadoTurno(EstadoTurnoBase):
     class Config:
         orm_mode = True
 
-class DetalleMantenimientoBase(BaseModel):
-    tipo: str
+class ConceptoDetalleBase(BaseModel):
     descripcion: str
-    cantidad: int
+    tiempo_estimado: Optional[float]
+    costo: float
+    tipo_concepto :str
+
+class ConceptoDetalleCreate(ConceptoDetalleBase):
+    uuidConcepto: UUID
+
+class DetalleMantenimientoBase(BaseModel):
+    descripcion: str
+    cantidad: Optional[int] = 1
     costo_unitario: float
 
-class DetalleMantenimientoCreate(DetalleMantenimientoBase):
-    pass
+class DetalleMantenimientoCreate(BaseModel):
+    concepto_id: UUID
+    cantidad: Optional[int] = 1
 
-class TareaManualBase(BaseModel):
-    descripcion_tarea: str
-    tiempo_estimado: float
-
-class TareaManualCreate(TareaManualBase):
-    pass
-
-class TareaManual(TareaManualBase):
-    uuidTarea: UUID
-
-    class Config:
-        orm_mode = True
-
-class RepuestoBase(BaseModel):
-    nombre_repuesto: str
-    marca_repuesto: str
-
-class RepuestoCreate(RepuestoBase):
-    pass
-
-class Repuesto(RepuestoBase):
-    uuidRepuesto: UUID
-
-    class Config:
-        orm_mode = True
-
-class DetalleMantenimiento(DetalleMantenimientoBase):
+class DetalleMantenimiento(BaseModel):
     uuidDetalle: UUID
-    tarea_manual: Optional[TareaManual]
-    repuesto: Optional[Repuesto]
+    descripcion: str
+    cantidad: int
+    costo_total: Optional[float]
 
     class Config:
         orm_mode = True
+
+
+
+
 
 class EstadoMantenimientoBase(BaseModel):
     uuidEstadoMantenimiento: UUID
@@ -185,10 +173,17 @@ class TurnoBase(BaseModel):
 class TurnoCreate(TurnoBase):
     pass
 
+
+class TurnoREsponseDetail(TurnoBase):
+    taller_mecanico: TallerMecanico
+    estadoMantenimiento: EstadoTurnoBase
+    
+
+
 class TurnoResponseReserva(TurnoBase):
     uuidTurno: UUID
     taller_mecanico: TallerMecanico
-    estadoMantenimiento: EstadoMantenimientoBase
+    ##estadoMantenimiento: EstadoMantenimientoBase
     class Config:
         orm_mode = True
 
@@ -198,6 +193,10 @@ class Turno(TurnoBase):
 
     class Config:
         orm_mode = True
+
+
+
+
 
 class EmailPasswordRequestForm(BaseModel):
     email: str
@@ -213,3 +212,27 @@ class ResetPasswordRequest(BaseModel):
     new_password: str
 
 DetalleMantenimiento.update_forward_refs()
+
+
+
+
+class InvoiceItem(BaseModel):
+    product_id: int
+    quantity: int
+    rate: float
+
+class PaymentGateway(BaseModel):
+    configured: bool
+    additional_field1: str
+    gateway_name: str
+
+class PaymentOptions(BaseModel):
+    payment_gateways: List[PaymentGateway]
+
+class Invoice(BaseModel):
+    customer_id: int
+    currency_id: int
+    due_date: str
+    invoice_items: List[InvoiceItem]
+    payment_options: PaymentOptions
+    allow_partial_payments: bool

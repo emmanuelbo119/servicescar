@@ -13,7 +13,7 @@ INSERT INTO public.taller_mecanicos ("uuidTallermecanico",nombre,direccion,latit
 	 ('a726b659-ecb5-4200-9319-68f43f861ff2','Automotriz Andina','Av. Colón 890, La Rioja',-29.4135,-66.8557,'Lunes a Viernes de 8:00 a 18:00','Cambio de neumáticos, Reparación de frenos, Electricidad del automóvil','2024-05-26 00:00:00','2024-05-26 00:00:00'),
 	 ('5927c22d-92a3-4ea9-8b63-928474208499','Taller Centro','Calle 10 234, Tucumán',-26.822,-65.207,'Lunes a Viernes de 8:00 a 18:00','Mecánica general, Diagnóstico computarizado, Cambio de aceite','2024-05-26 00:00:00','2024-05-26 00:00:00');
 
-
+	
 
 --Marcas Vehiculos
 INSERT INTO public.marca_vehiculos (uuidmarcavehiculo,nombre,descripcion,fechacreacion,fechamodificacion) VALUES
@@ -126,3 +126,40 @@ VALUES
     ('uuid_generate_v4()', 'En proceso', 'Estado cuando el presupuesto ha sido aceptado y el mantenimiento está en curso'),
     ('uuid_generate_v4()', 'Pausado', 'Estado cuando el mantenimiento ha sido pausado'),
     ('uuid_generate_v4()', 'Completado', 'Estado cuando el mantenimiento ha sido completado');
+
+
+
+
+
+INSERT INTO public.concepto_detalle ("uuidConcepto", descripcion, tiempo_estimado, costo, tipo_concepto)
+VALUES
+    ('1b50ac5f-67b0-494e-9a58-53ea09f1e448', 'Filtro de aceite - Ford', NULL, 1500.0, 'Repuesto'),
+    ('e4d301c4-5cfa-4d9a-9d05-14d08f08c705', 'Disco de freno - Chevrolet', NULL, 3500.0, 'Repuesto'),
+    ('fa0863ab-dbd6-42a8-bf8f-8a8e7a0385f4', 'Cambio de bujías - Toyota', NULL, 2000.0, 'Repuesto'),
+    ('a1a39c95-cc13-45aa-bd53-d1e6f15b9c57', 'Filtro de aire - Volkswagen', NULL, 1800.0, 'Repuesto'),
+    ('3aa7a3ab-8727-4b2b-9c60-54e5bfdb1608', 'Eje de transmisión - Renault', NULL, 6000.0, 'Repuesto'),
+    ('a08f2d3e-65d6-4e59-a2d1-77b6fa7f57e6', 'Cambio de aceite - Peugeot', NULL, 1600.0, 'Repuesto'),
+    ('bd6f2b7b-306b-4e68-8485-42f0bf0e8c4f', 'Espejo retrovisor - Fiat', NULL, 4000.0, 'Repuesto'),
+    ('0f6a138a-319f-45a8-9987-64e4b6b7e0a7', 'Filtro de combustible - Citroën', NULL, 2200.0, 'Repuesto'),
+    ('c5701e45-19d7-4e16-a663-0e85f7eb121f', 'Filtro de aceite - Nissan', NULL, 1800.0, 'Repuesto'),
+    ('d57f7d06-681f-4642-8e90-6ee10d3c446f', 'Filtro de aire - Honda', NULL, 2000.0, 'Repuesto'),
+    ('c74e94d3-9c16-4194-b6c5-17a0b23f5f5e', 'Filtro de aceite - Hyundai', NULL, 1600.0, 'Repuesto'),
+    ('7d7e702e-22b3-43bf-9878-6326a3d16725', 'Filtro de aire - Kia', NULL, 2200.0, 'Repuesto'),
+    ('d5e1f32f-06d0-4fb3-a9e2-26a2f85c9b0e', 'Filtro de aire - Jeep', NULL, 3000.0, 'Repuesto'),
+    ('2cf13813-1a8b-4f0a-a4b4-6a9515e6577c', 'Filtro de aceite - Subaru', NULL, 2500.0, 'Repuesto'),
+    ('b1b3bf1d-413a-4312-8b1f-0c9c1d7014a6', 'Depósito de refrigerante - BMW', NULL, 5000.0, 'Repuesto'),
+    ('eb8cfbac-d362-4a18-bc87-3271e393e71a', 'Disco de freno - Mercedes-Benz', NULL, 4000.0, 'Repuesto'),
+    ('ef9e6ee3-7eb7-4a37-904b-07d24389f172', 'Eje de transmisión - Audi', NULL, 7000.0, 'Repuesto'),
+    ('15f33c1e-c5d0-45c1-9e19-43e5b6d9d70e', 'Espejo retrovisor - Mitsubishi', NULL, 3500.0, 'Repuesto'),
+    ('23a27e2f-7e8d-4b0b-8d24-5e1581416ba6', 'Filtro de aceite - Suzuki', NULL, 1800.0, 'Repuesto'),
+    ('c4f6e101-69e5-496f-bf42-8a9c53e632ef', 'Filtro de aire - Chery', NULL, 2000.0, 'Repuesto'),
+    ('2d318d45-21e0-4395-8b78-7b827f5c75ff', 'Cambio de aceite', 1.0, 2500.0, 'Tarea Manual'),
+    ('8bf304f7-6c15-46f3-bbd7-3d67d20e16d8', 'Reemplazo de filtro de aire', 0.5, 1500.0, 'Tarea Manual'),
+    ('14d260f6-00f5-4c98-b170-8c13c4483764', 'Revisión de frenos', 1.5, 4000.0, 'Tarea Manual'),
+    ('570b2c2c-488e-4a1c-9e61-0c5b56b48d92', 'Ajuste de frenos', 1.0, 3000.0, 'Tarea Manual'),
+    ('d39e1c1d-7d55-4f3a-974c-07d33f2a4895', 'Cambio de bujías', 0.8, 2000.0, 'Tarea Manual'),
+    ('e53f46b3-2b22-4e18-aa6e-67ee1990f21d', 'Revisión del sistema de suspensión', 1.2, 3500.0, 'Tarea Manual'),
+    ('6e5ceac2-c2f0-4c77-a1f2-54a3520b72d4', 'Reemplazo de la correa de distribución', 3.0, 6000.0, 'Tarea Manual'),
+    ('9b64b77e-12c1-4d2a-8e67-998f1996a22b', 'Revisión del sistema de refrigeración', 1.0, 2800.0, 'Tarea Manual'),
+    ('f3fe90f2-23d8-4a6b-a34f-31422311fda1', 'Cambio del filtro de combustible', 0.7, 1800.0, 'Tarea Manual'),
+    ('bae9cf8d-601c-4d8d-8d5e-20d55363bf6c', 'Alineación de las ruedas', 1.5, 3200.0, 'Tarea Manual');

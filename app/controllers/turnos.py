@@ -1,4 +1,5 @@
 from typing import List
+import requests
 from sqlalchemy.orm import Session,joinedload
 from fastapi import HTTPException
 from datetime import date, datetime, time, timedelta
@@ -208,7 +209,9 @@ def get_turnos(db: Session, skip: int, limit: int):
     return turnos
 
 def get_turnosById(db: Session,turno_id:uuid.UUID):
-    turnos = db.query(TurnoModel).filter(TurnoModel.uuidTurno == turno_id)
+    turnos = db.query(TurnoModel).filter(TurnoModel.uuidTurno == turno_id)\
+    .join(TurnoVehiculos,TurnoVehiculos.uuidTurno == TurnoModel.uuidTurno)\
+    .join(VehiculoModel, TurnoVehiculos.uuidVehiculo == VehiculoModel.uuidvehiculo)
     return turnos
 
 

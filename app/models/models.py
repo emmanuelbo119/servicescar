@@ -70,35 +70,14 @@ class EstadoMantenimiento(Base):
     turno = relationship("Turno", back_populates="estadoMantenimiento", uselist=False)
 
 
-class TipoDetalle(enum.Enum):
-    TAREA_MANUAL = "TAREA_MANUAL"
-    REPUESTO = "REPUESTO"
 
-
-class TareaManual(Base):
-    __tablename__ = "tarea_manual"
-    uuidTarea = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    descripcion_tarea = Column(Text, nullable=False)
-    tiempo_estimado = Column(Float, nullable=False)
+class ConceptoDetalle(Base):
+    __tablename__ = "concepto_detalle"
+    uuidConcepto = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    descripcion= Column(Text, nullable=False)
+    tiempo_estimado = Column(Float, nullable=True)
     costo = Column(Float, nullable=False)
-    detalle_id = Column(UUID(as_uuid=True), ForeignKey("detalle_mantenimientos.uuidDetalle"))
-    
-    detalle = relationship("DetalleMantenimiento", back_populates="tarea_manual")
-
-class Repuesto(Base):
-    __tablename__ = "repuesto"
-    uuidRepuesto = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    nombre_repuesto = Column(String, nullable=False)
-    marca_repuesto = Column(String, nullable=False)
-    costo = Column(Float, nullable=False)
-    detalle_id = Column(UUID(as_uuid=True), ForeignKey("detalle_mantenimientos.uuidDetalle"))
-    
-    detalle = relationship("DetalleMantenimiento", back_populates="repuesto")
-
-
-
-## Tablas complejas 
-
+    tipo_concepto = Column(String(255), nullable=False)
 
 class Usuario(Base):
     __tablename__ = "usuarios"
@@ -164,14 +143,15 @@ class DetalleMantenimiento(Base):
     __tablename__ = "detalle_mantenimientos"
     uuidDetalle = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     uuidTurno = Column(UUID(as_uuid=True), ForeignKey("turnos.uuidTurno"), nullable=False)
-    tipo = Column(Enum(TipoDetalle), nullable=False)
     descripcion = Column(Text, nullable=False)
     cantidad = Column(Integer, nullable=False)
     costo_unitario = Column(Float, nullable=False)
-    
-    tarea_manual = relationship("TareaManual", back_populates="detalle")
-    repuesto = relationship("Repuesto", back_populates="detalle")
+    uuidConcepto = Column(UUID(as_uuid=True), ForeignKey("concepto_detalle.uuidConcepto"), nullable=False)
+    costo_total = Column(Float, nullable=True)
+    # Relaciones
     turno = relationship("Turno", back_populates="detalles")
+    concepto = relationship("ConceptoDetalle")
+
 
 class TurnoVehiculos(Base):
     __tablename__ = "turno_vehiculos"
